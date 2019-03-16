@@ -1,10 +1,10 @@
 package com.ultimalabs.sattrackapi.service;
 
 import com.ultimalabs.sattrackapi.config.SatTrackConfig;
+import com.ultimalabs.sattrackapi.model.RichTLE;
 import com.ultimalabs.sattrackapi.util.UrlDataReader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.orekit.propagation.analytical.tle.TLE;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +30,7 @@ public class TleFetcherService {
     /**
      * A set of TLE objects
      */
-    private Set<TLE> tleSet = new HashSet<>();
+    private Set<RichTLE> tleSet = new HashSet<>();
 
     /**
      * Fetches TLE data from remote URLs
