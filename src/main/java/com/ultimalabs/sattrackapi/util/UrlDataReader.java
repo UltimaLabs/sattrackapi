@@ -31,7 +31,7 @@ public class UrlDataReader {
 
         // create the url
         if (!UrlValidation.isValid(dataUrl)) {
-            log.error("Invalid URL: " + dataUrl);
+            log.error("Invalid URL: '" + dataUrl + "'");
             return Collections.emptyList();
         }
 
@@ -40,7 +40,7 @@ public class UrlDataReader {
         try {
             url = new URL(dataUrl);
         } catch (MalformedURLException e) {
-            log.error("Invalid URL " + dataUrl + ": " + e);
+            log.error("Invalid URL '" + dataUrl + "': " + e);
             return Collections.emptyList();
         }
 

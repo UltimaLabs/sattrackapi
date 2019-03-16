@@ -19,6 +19,16 @@ import java.util.List;
 public class SatTrackConfig {
 
     /**
+     * Orekit data folder
+     */
+    private String orekitDataFolder;
+
+    /**
+     * Cron entry for TLE data refresh
+     */
+    private String tleUpdateCron;
+
+    /**
      * List of TLE data source URLs
      */
     @NotNull

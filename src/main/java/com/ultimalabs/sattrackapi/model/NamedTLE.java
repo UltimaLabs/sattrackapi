@@ -7,14 +7,14 @@ import java.util.Objects;
 /**
  * TLE with satellite name and string lines validation
  */
-public class RichTLE extends TLE {
+public class NamedTLE extends TLE {
 
     /**
      * Satellite name
      */
     private String name;
 
-    public RichTLE(String name, String line1, String line2) {
+    public NamedTLE(String name, String line1, String line2) {
         super(line1, line2);
         this.name = name;
     }
@@ -38,11 +38,12 @@ public class RichTLE extends TLE {
      * @return true if name is valid
      */
     public static boolean isValidSatelliteName(String text) {
+
         if (text == null) {
             return false;
         }
 
-        if (text.startsWith("1") || text.startsWith("2")) {
+        if (looksLikeTleLine(text, 1) || looksLikeTleLine(text, 2)) {
             return false;
         }
 
@@ -82,11 +83,11 @@ public class RichTLE extends TLE {
     @Override
     public boolean equals(final Object o) {
 
-        if (!(o instanceof RichTLE)) {
+        if (!(o instanceof NamedTLE)) {
             return false;
         }
 
-        final RichTLE tle = (RichTLE) o;
+        final NamedTLE tle = (NamedTLE) o;
 
         return (super.equals(o) && tle.getName().equals(this.name));
     }

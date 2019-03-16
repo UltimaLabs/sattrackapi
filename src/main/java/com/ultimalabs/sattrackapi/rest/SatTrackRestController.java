@@ -1,13 +1,11 @@
 package com.ultimalabs.sattrackapi.rest;
 
+import com.ultimalabs.sattrackapi.config.SatTrackConfig;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.ultimalabs.sattrackapi.config.SatTrackConfig;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 
 /**
  * Sat Track REST controller
@@ -25,9 +23,9 @@ public class SatTrackRestController {
      */
     private final SatTrackConfig config;
 
-    @GetMapping("/test")
+    @GetMapping("/hello")
     public String testController() {
-	return "Hello world";
+        return "Hello there";
     }
 
 }
