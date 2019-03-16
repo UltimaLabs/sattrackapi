@@ -2,6 +2,7 @@ package com.ultimalabs.sattrackapi.util;
 
 import com.ultimalabs.sattrackapi.model.NamedTLE;
 import com.ultimalabs.sattrackapi.model.TleDataStore;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.Map;
 /**
  * Builds a TLE data store
  */
+@Slf4j
 public class TleDataStoreBuilder {
 
     private TleDataStoreBuilder() {
@@ -35,6 +37,8 @@ public class TleDataStoreBuilder {
         String lineMinus1;
         String lineMinus2;
 
+        int numContructedTles = 0;
+
         // we're looking for a valid line2 and then working our way back
         // to fetch the data for a valid TLE
         for (int i = 0; i < tleTextData.size(); i++) {
@@ -56,6 +60,9 @@ public class TleDataStoreBuilder {
             NamedTLE singleTle = buildSingleTle(lineMinus2, lineMinus1, line);
 
             if (singleTle != null) {
+
+                numContructedTles++;
+
                 tleBySatelliteId.put(singleTle.getSatelliteNumber(), singleTle);
 
                 // Orekit's native methods apparently return wrong values so
@@ -69,6 +76,8 @@ public class TleDataStoreBuilder {
         if (tleBySatelliteId.isEmpty() || tleByInternationalDesignator.isEmpty()) {
             return null;
         }
+
+        log.info("Number of constructed TLEs: " + numContructedTles);
 
         return new TleDataStore(tleBySatelliteId, tleByInternationalDesignator);
 

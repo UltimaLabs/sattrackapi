@@ -16,7 +16,12 @@ public class NamedTLE extends TLE {
 
     public NamedTLE(String name, String line1, String line2) {
         super(line1, line2);
-        this.name = name;
+
+        if (name == null) {
+            this.name = "";
+        } else {
+            this.name = name;
+        }
     }
 
     /**
@@ -87,9 +92,8 @@ public class NamedTLE extends TLE {
             return false;
         }
 
-        final NamedTLE tle = (NamedTLE) o;
+        return (super.equals(o) && this.name.equals(((NamedTLE) o).getName()));
 
-        return (super.equals(o) && tle.getName().equals(this.name));
     }
 
     /**

@@ -10,6 +10,8 @@ import org.orekit.data.DirectoryCrawler;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -27,11 +29,11 @@ class TleDataStoreBuilderTest {
             "2 25544  51.6411 116.5260 0004049 100.8410  14.7809 15.52801380160405"
     ));
 
-    private TleDataStore issInvalid1 = TleDataStoreBuilder.buildTleMaps(Arrays.asList(
+    private TleDataStore issInvalid1 = TleDataStoreBuilder.buildTleMaps(Collections.singletonList(
             "1 25544U 98067A   19072.58486381 -.00000050  00000-0  67055-5 0  9996"
     ));
 
-    private TleDataStore issInvalid2 = TleDataStoreBuilder.buildTleMaps(Arrays.asList(
+    private TleDataStore issInvalid2 = TleDataStoreBuilder.buildTleMaps(Collections.singletonList(
             "2 25544  51.6411 116.5260 0004049 100.8410  14.7809 15.52801380160405"
     ));
 
@@ -44,10 +46,11 @@ class TleDataStoreBuilderTest {
             "2 33591  99.1742  61.2940 0013053 292.9494  67.0299 14.12338669520180"
     ));
 
+
     @BeforeAll
     static void setup() {
         // Orekit setup: at least a single file, "tai-utc.dat"
-        // should be present in src/test/resources folder
+        // should be present in "src/test/resources" folder
         File orekitData = new File(".");
         DataProvidersManager manager = DataProvidersManager.getInstance();
         manager.addProvider(new DirectoryCrawler(orekitData));
@@ -63,6 +66,18 @@ class TleDataStoreBuilderTest {
     @Test
     void singleTleWithNameCount() {
         assertEquals(1, issWithName.getTleMapBySatelliteId().size());
+    }
+
+    @DisplayName("Test null parameter")
+    @Test
+    void testNullParameter() {
+        assertNull(TleDataStoreBuilder.buildTleMaps(null));
+    }
+
+    @DisplayName("Test empty list parameter")
+    @Test
+    void testEmptyListParameter() {
+        assertNull(TleDataStoreBuilder.buildTleMaps(new LinkedList<>()));
     }
 
     @DisplayName("No valid TLEs 1")
@@ -113,7 +128,7 @@ class TleDataStoreBuilderTest {
         NamedTLE byId = issWithoutName.getTleMapBySatelliteId().get(25544);
         NamedTLE byIntDesignator = issWithoutName.getTleMapByInternationalDesignator().get("98067A");
 
-        assertEquals(byId.getSatelliteNumber(), byIntDesignator.getSatelliteNumber());
+        assertEquals(byId, byIntDesignator);
 
     }
 
@@ -124,11 +139,11 @@ class TleDataStoreBuilderTest {
         assertEquals("NOAA 18 [B]", noaa18.getName());
     }
 
-    @DisplayName("Test null name")
+    @DisplayName("Test empty name")
     @Test
-    void nullSatelliteName() {
+    void emptySatelliteName() {
         NamedTLE iss = issWithoutName.getTleMapByInternationalDesignator().get("98067A");
-        assertNull(iss.getName());
+        assertEquals("", iss.getName());
     }
 
 }
