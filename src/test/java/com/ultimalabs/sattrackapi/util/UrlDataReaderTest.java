@@ -10,25 +10,25 @@ class UrlDataReaderTest {
     @DisplayName("Test reading data from an invalid URL")
     @Test
     void readStringFromInvalidUrl1() {
-        assertNull(UrlDataReader.readStringFromUrl(""));
+        assertTrue(UrlDataReader.readStringDataFromUrl("").isEmpty());
     }
 
     @DisplayName("Test reading data from a nonexistent domain")
     @Test
     void readStringFromInvalidUrl2() {
-        assertNull(UrlDataReader.readStringFromUrl("http://www.this-domain-most-probably-does-not-exist.com/"));
+        assertTrue(UrlDataReader.readStringDataFromUrl("http://www.this-domain-most-probably-does-not-exist.com/").isEmpty());
     }
 
     @DisplayName("Test reading data with 404 response")
     @Test
     void readStringFromInvalidUrl3() {
-        assertNull(UrlDataReader.readStringFromUrl("https://www.ultimalabs.com/nosuchfile.txt"));
+        assertTrue(UrlDataReader.readStringDataFromUrl("https://www.ultimalabs.com/nosuchfile.txt").isEmpty());
     }
 
     @DisplayName("Test reading a valid resource")
     @Test
     void readStringFromInvalidUrl4() {
-        assertTrue(UrlDataReader.readStringFromUrl("https://download.ultimalabs.com/files/tle/galileo.txt").length() > 1024);
+        assertFalse(UrlDataReader.readStringDataFromUrl("https://download.ultimalabs.com/files/tle/galileo.txt").isEmpty());
     }
 
 }

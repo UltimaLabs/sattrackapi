@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * URL data reader utility class
@@ -24,12 +27,12 @@ public class UrlDataReader {
      * @param dataUrl data URL
      * @return contents of a file given by URL
      */
-    public static String readStringFromUrl(String dataUrl) {
+    public static List<String> readStringDataFromUrl(String dataUrl) {
 
         // create the url
         if (!UrlValidation.isValid(dataUrl)) {
             log.error("Invalid URL: " + dataUrl);
-            return null;
+            return Collections.emptyList();
         }
 
         URL url;
@@ -38,21 +41,20 @@ public class UrlDataReader {
             url = new URL(dataUrl);
         } catch (MalformedURLException e) {
             log.error("Invalid URL " + dataUrl + ": " + e);
-            return null;
+            return Collections.emptyList();
         }
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
-            StringBuilder result = new StringBuilder();
+            List<String> result = new ArrayList<>();
             String line;
             while ((line = reader.readLine()) != null) {
-                result.append(line);
-                result.append(System.lineSeparator());
+                result.add(line);
             }
             log.info("Successfully read data from " + dataUrl);
-            return result.toString();
+            return result;
         } catch (IOException e) {
             log.error("There was an error reading data from " + dataUrl + ": " + e);
-            return null;
+            return Collections.emptyList();
         }
 
     }

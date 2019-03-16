@@ -4,12 +4,15 @@ import com.ultimalabs.sattrackapi.config.SatTrackConfig;
 import com.ultimalabs.sattrackapi.util.UrlDataReader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.orekit.propagation.analytical.tle.TLE;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Fetches TLEs from remote URLs
@@ -25,31 +28,26 @@ public class TleFetcherService {
     private final SatTrackConfig config;
 
     /**
-     * Raw TLE data - concatenation of all the TLE files
+     * A set of TLE objects
      */
-    private String rawTleData;
+    private Set<TLE> tleSet = new HashSet<>();
 
     /**
      * Fetches TLE data from remote URLs
      */
     @PostConstruct
     @Scheduled(cron = "${sattrack.tleUpdateCron}")
-    public void fetchTleData() {
+    public void buildTleObjects() {
 
         List<String> tleUrls = config.getTleUrls();
 
-        StringBuilder allTleFileData = new StringBuilder();
+        List<String> allTleFileData = new ArrayList<>();
 
         for (String tleUrl : tleUrls) {
-            String content = UrlDataReader.readStringFromUrl(tleUrl);
-            if (tleUrl.equals("https://download.ultimalabs.com/files/tle/other.txt")) {
-                log.info("Content of 'others.txt':\n" + content);
-            }
-            allTleFileData.append(UrlDataReader.readStringFromUrl(tleUrl));
+            allTleFileData.addAll(UrlDataReader.readStringDataFromUrl(tleUrl));
         }
 
-        rawTleData = allTleFileData.toString();
-
     }
+
 
 }
