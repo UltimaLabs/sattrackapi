@@ -31,13 +31,18 @@ public class RichTLE extends TLE {
     /**
      * Check whether string is a valid satellite name
      * <p>
-     * The name should be at least three characters long.
+     * The name should be at least three characters long and cannot
+     * start with "1" or "2".
      *
      * @param text a string containing satellite name
      * @return true if name is valid
      */
     public static boolean isValidSatelliteName(String text) {
         if (text == null) {
+            return false;
+        }
+
+        if (text.startsWith("1") || text.startsWith("2")) {
             return false;
         }
 

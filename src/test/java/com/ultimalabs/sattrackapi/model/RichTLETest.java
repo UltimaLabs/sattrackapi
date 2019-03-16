@@ -20,6 +20,18 @@ class RichTLETest {
         assertFalse(RichTLE.isValidSatelliteName(""));
     }
 
+    @DisplayName("Satellite name can't start with '1'")
+    @Test
+    void SatelliteNameDoesNotStartWith1() {
+        assertFalse(RichTLE.isValidSatelliteName("1FOO"));
+    }
+
+    @DisplayName("Satellite name can't start with '2'")
+    @Test
+    void SatelliteNameDoesNotStartWith2() {
+        assertFalse(RichTLE.isValidSatelliteName("2 BAR"));
+    }
+
     @DisplayName("Test valid satellite name")
     @Test
     void validSatelliteName() {
