@@ -1,6 +1,5 @@
-package com.ultimalabs.sattrackapi.util;
+package com.ultimalabs.sattrackapi.tle.util;
 
-import com.ultimalabs.sattrackapi.tle.util.UrlDataReader;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
