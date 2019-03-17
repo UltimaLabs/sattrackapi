@@ -1,11 +1,11 @@
 package com.ultimalabs.sattrackapi.service;
 
-import com.ultimalabs.sattrackapi.model.NamedTLE;
+import com.ultimalabs.sattrackapi.model.TLEPlus;
 
 public interface TleFetcherService {
 
-    NamedTLE getTleBySatelliteId(int id);
+    TLEPlus getTleBySatelliteId(int id);
 
-    NamedTLE getTleByInternationalDesignator(String designator);
+    TLEPlus getTleByInternationalDesignator(String designator);
 
 }

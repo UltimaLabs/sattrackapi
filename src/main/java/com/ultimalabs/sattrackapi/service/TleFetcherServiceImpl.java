@@ -1,7 +1,7 @@
 package com.ultimalabs.sattrackapi.service;
 
 import com.ultimalabs.sattrackapi.config.SatTrackConfig;
-import com.ultimalabs.sattrackapi.model.NamedTLE;
+import com.ultimalabs.sattrackapi.model.TLEPlus;
 import com.ultimalabs.sattrackapi.model.TleDataStore;
 import com.ultimalabs.sattrackapi.util.TleDataStoreBuilder;
 import com.ultimalabs.sattrackapi.util.UrlDataReader;
@@ -42,7 +42,7 @@ public class TleFetcherServiceImpl implements TleFetcherService {
      * @return TLE or null if Catalog Number was not found
      */
     @Override
-    public NamedTLE getTleBySatelliteId(int id) {
+    public TLEPlus getTleBySatelliteId(int id) {
         if (tleStore == null) {
             return null;
         }
@@ -57,12 +57,12 @@ public class TleFetcherServiceImpl implements TleFetcherService {
      * @return TLE or null if International Designator was not found
      */
     @Override
-    public NamedTLE getTleByInternationalDesignator(String designator) {
+    public TLEPlus getTleByInternationalDesignator(String designator) {
         if (tleStore == null) {
             return null;
         }
 
-        return tleStore.getTleMapBySatelliteId().get(designator);
+        return tleStore.getTleMapByInternationalDesignator().get(designator);
     }
 
     /**

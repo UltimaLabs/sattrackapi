@@ -1,6 +1,6 @@
 package com.ultimalabs.sattrackapi.util;
 
-import com.ultimalabs.sattrackapi.model.NamedTLE;
+import com.ultimalabs.sattrackapi.model.TLEPlus;
 import com.ultimalabs.sattrackapi.model.TleDataStore;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -45,7 +45,6 @@ class TleDataStoreBuilderTest {
             "NOAA 19 [+]             ",
             "2 33591  99.1742  61.2940 0013053 292.9494  67.0299 14.12338669520180"
     ));
-
 
     @BeforeAll
     static void setup() {
@@ -125,25 +124,11 @@ class TleDataStoreBuilderTest {
     @DisplayName("Compare TLE's fetched by Satellite Id and International Designator")
     @Test
     void compareTles1() {
-        NamedTLE byId = issWithoutName.getTleMapBySatelliteId().get(25544);
-        NamedTLE byIntDesignator = issWithoutName.getTleMapByInternationalDesignator().get("98067A");
+        TLEPlus byId = issWithoutName.getTleMapBySatelliteId().get(25544);
+        TLEPlus byIntDesignator = issWithoutName.getTleMapByInternationalDesignator().get("98067A");
 
         assertEquals(byId, byIntDesignator);
 
-    }
-
-    @DisplayName("Test satellite name trimming")
-    @Test
-    void nameTrim() {
-        NamedTLE noaa18 = onlyNoaa18Valid.getTleMapByInternationalDesignator().get("05018A");
-        assertEquals("NOAA 18 [B]", noaa18.getName());
-    }
-
-    @DisplayName("Test empty name")
-    @Test
-    void emptySatelliteName() {
-        NamedTLE iss = issWithoutName.getTleMapByInternationalDesignator().get("98067A");
-        assertEquals("", iss.getName());
     }
 
 }

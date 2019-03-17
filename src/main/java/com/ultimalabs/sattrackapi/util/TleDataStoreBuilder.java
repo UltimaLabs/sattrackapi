@@ -1,6 +1,6 @@
 package com.ultimalabs.sattrackapi.util;
 
-import com.ultimalabs.sattrackapi.model.NamedTLE;
+import com.ultimalabs.sattrackapi.model.TLEPlus;
 import com.ultimalabs.sattrackapi.model.TleDataStore;
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,8 +30,8 @@ public class TleDataStoreBuilder {
             return null;
         }
 
-        Map<Integer, NamedTLE> tleBySatelliteId = new HashMap<>();
-        Map<String, NamedTLE> tleByInternationalDesignator = new HashMap<>();
+        Map<Integer, TLEPlus> tleBySatelliteId = new HashMap<>();
+        Map<String, TLEPlus> tleByInternationalDesignator = new HashMap<>();
 
         String line;
         String lineMinus1;
@@ -45,7 +45,7 @@ public class TleDataStoreBuilder {
 
             line = tleTextData.get(i);
 
-            if (!NamedTLE.looksLikeTleLine(line, 2) || i == 0) {
+            if (!TLEPlus.looksLikeTleLine(line, 2) || i == 0) {
                 continue;
             }
 
@@ -57,18 +57,14 @@ public class TleDataStoreBuilder {
                 lineMinus2 = null;
             }
 
-            NamedTLE singleTle = buildSingleTle(lineMinus2, lineMinus1, line);
+            TLEPlus singleTle = buildSingleTle(lineMinus2, lineMinus1, line);
 
             if (singleTle != null) {
 
                 numContructedTles++;
 
                 tleBySatelliteId.put(singleTle.getSatelliteNumber(), singleTle);
-
-                // Orekit's native methods apparently return wrong values so
-                // we're pulling intDesignator from text data
-                String intDesignator = lineMinus1.substring(9, 16).trim();
-                tleByInternationalDesignator.put(intDesignator, singleTle);
+                tleByInternationalDesignator.put(singleTle.getInternationalDesignator(), singleTle);
             }
 
         }
@@ -84,20 +80,20 @@ public class TleDataStoreBuilder {
     }
 
     /**
-     * Builds a single NamedTLE object
+     * Builds a single TLEPlus object
      *
      * @param satName satellite name
      * @param line1   TLE line1
      * @param line2   TLE line2
      * @return TLE object or null in case of error
      */
-    private static NamedTLE buildSingleTle(String satName, String line1, String line2) {
+    private static TLEPlus buildSingleTle(String satName, String line1, String line2) {
 
-        if (!NamedTLE.looksLikeTleLine(line1, 1) || !NamedTLE.looksLikeTleLine(line2, 2)) {
+        if (!TLEPlus.looksLikeTleLine(line1, 1) || !TLEPlus.looksLikeTleLine(line2, 2)) {
             return null;
         }
 
-        if (!NamedTLE.isFormatOK(line1, line2)) {
+        if (!TLEPlus.isFormatOK(line1, line2)) {
             return null;
         }
 
@@ -105,11 +101,11 @@ public class TleDataStoreBuilder {
             satName = satName.trim();
         }
 
-        if (!NamedTLE.isValidSatelliteName(satName)) {
-            return new NamedTLE(null, line1, line2);
+        if (!TLEPlus.isValidSatelliteTitle(satName)) {
+            return new TLEPlus(null, line1, line2);
         }
 
-        return new NamedTLE(satName, line1, line2);
+        return new TLEPlus(satName, line1, line2);
 
     }
 

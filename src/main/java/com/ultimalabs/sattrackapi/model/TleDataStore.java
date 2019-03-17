@@ -13,11 +13,11 @@ public class TleDataStore {
     /**
      * Map of TLE objects, indexed by Satellite Catalog Number
      */
-    private final Map<Integer, NamedTLE> tleMapBySatelliteId;
+    private final Map<Integer, TLEPlus> tleMapBySatelliteId;
 
     /**
      * Map of TLE objects, indexed by International Designator
      */
-    private final Map<String, NamedTLE> tleMapByInternationalDesignator;
+    private final Map<String, TLEPlus> tleMapByInternationalDesignator;
 
 }
