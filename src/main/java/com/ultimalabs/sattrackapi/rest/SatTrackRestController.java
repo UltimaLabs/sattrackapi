@@ -1,8 +1,8 @@
 package com.ultimalabs.sattrackapi.rest;
 
 import com.ultimalabs.sattrackapi.config.SatTrackConfig;
-import com.ultimalabs.sattrackapi.model.TLEPlus;
-import com.ultimalabs.sattrackapi.service.TleFetcherService;
+import com.ultimalabs.sattrackapi.tle.model.TLEPlus;
+import com.ultimalabs.sattrackapi.tle.service.TleFetcherService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.http.HttpStatus;

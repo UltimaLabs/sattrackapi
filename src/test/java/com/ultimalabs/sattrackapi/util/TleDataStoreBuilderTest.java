@@ -1,7 +1,8 @@
 package com.ultimalabs.sattrackapi.util;
 
-import com.ultimalabs.sattrackapi.model.TLEPlus;
-import com.ultimalabs.sattrackapi.model.TleDataStore;
+import com.ultimalabs.sattrackapi.tle.model.TLEPlus;
+import com.ultimalabs.sattrackapi.tle.model.TleDataStore;
+import com.ultimalabs.sattrackapi.tle.util.TleDataStoreBuilder;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

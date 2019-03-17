@@ -1,4 +1,4 @@
-package com.ultimalabs.sattrackapi.model;
+package com.ultimalabs.sattrackapi.tle.model;
 
 import org.orekit.errors.OrekitException;
 import org.orekit.errors.OrekitMessages;

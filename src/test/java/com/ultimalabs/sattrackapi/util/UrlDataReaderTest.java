@@ -1,9 +1,11 @@
 package com.ultimalabs.sattrackapi.util;
 
+import com.ultimalabs.sattrackapi.tle.util.UrlDataReader;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class UrlDataReaderTest {
 

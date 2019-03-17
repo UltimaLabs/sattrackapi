@@ -1,5 +1,6 @@
 package com.ultimalabs.sattrackapi.util;
 
+import com.ultimalabs.sattrackapi.tle.util.UrlValidation;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

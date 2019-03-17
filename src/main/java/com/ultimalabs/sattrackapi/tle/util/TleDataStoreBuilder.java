@@ -1,7 +1,7 @@
-package com.ultimalabs.sattrackapi.util;
+package com.ultimalabs.sattrackapi.tle.util;
 
-import com.ultimalabs.sattrackapi.model.TLEPlus;
-import com.ultimalabs.sattrackapi.model.TleDataStore;
+import com.ultimalabs.sattrackapi.tle.model.TLEPlus;
+import com.ultimalabs.sattrackapi.tle.model.TleDataStore;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;

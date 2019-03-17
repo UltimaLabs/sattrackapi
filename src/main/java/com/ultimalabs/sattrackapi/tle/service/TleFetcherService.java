@@ -1,6 +1,6 @@
-package com.ultimalabs.sattrackapi.service;
+package com.ultimalabs.sattrackapi.tle.service;
 
-import com.ultimalabs.sattrackapi.model.TLEPlus;
+import com.ultimalabs.sattrackapi.tle.model.TLEPlus;
 
 public interface TleFetcherService {
 

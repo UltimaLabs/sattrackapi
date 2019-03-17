@@ -1,10 +1,10 @@
-package com.ultimalabs.sattrackapi.service;
+package com.ultimalabs.sattrackapi.tle.service;
 
 import com.ultimalabs.sattrackapi.config.SatTrackConfig;
-import com.ultimalabs.sattrackapi.model.TLEPlus;
-import com.ultimalabs.sattrackapi.model.TleDataStore;
-import com.ultimalabs.sattrackapi.util.TleDataStoreBuilder;
-import com.ultimalabs.sattrackapi.util.UrlDataReader;
+import com.ultimalabs.sattrackapi.tle.model.TLEPlus;
+import com.ultimalabs.sattrackapi.tle.model.TleDataStore;
+import com.ultimalabs.sattrackapi.tle.util.TleDataStoreBuilder;
+import com.ultimalabs.sattrackapi.tle.util.UrlDataReader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.orekit.data.DataProvidersManager;
