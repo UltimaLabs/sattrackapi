@@ -20,8 +20,8 @@ import org.springframework.web.server.ResponseStatusException;
 @Log
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/v1")
-public class SatTrackRestController {
+@RequestMapping("/api/v1/tle")
+public class TleController {
 
     /**
      * Config object
@@ -33,12 +33,7 @@ public class SatTrackRestController {
      */
     private final TleFetcherService tleFetcherService;
 
-    @GetMapping("/hello")
-    public String testController() {
-        return "Hello there";
-    }
-
-    @GetMapping("/tle/satelliteNumber/{id}")
+    @GetMapping("/satelliteNumber/{id}")
     public String getTleByNumber(@PathVariable int id) {
         TLEPlus tle = tleFetcherService.getTleBySatelliteId(id);
 
@@ -50,7 +45,7 @@ public class SatTrackRestController {
 
     }
 
-    @GetMapping("/tle/internationalDesignator/{designator}")
+    @GetMapping("/internationalDesignator/{designator}")
     public String getTleByInternationalDesignator(@PathVariable String designator) {
 
         TLEPlus tle = tleFetcherService.getTleByInternationalDesignator(designator);

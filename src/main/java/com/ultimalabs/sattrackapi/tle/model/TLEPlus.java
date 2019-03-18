@@ -19,13 +19,14 @@ public class TLEPlus extends TLE {
      */
     private String name;
 
-    public TLEPlus(String title, String line1, String line2) {
+    public TLEPlus(String name, String line1, String line2) {
         super(line1, line2);
 
-        if (title == null) {
+        // we're not enforcing the maximum name length of 24 chars
+        if (name == null) {
             this.name = "";
         } else {
-            this.name = title.trim();
+            this.name = name.trim();
         }
     }
 
@@ -50,6 +51,10 @@ public class TLEPlus extends TLE {
     public static boolean isValidSatelliteTitle(String text) {
 
         if (text == null) {
+            return false;
+        }
+
+        if (text.length() > 24) {
             return false;
         }
 

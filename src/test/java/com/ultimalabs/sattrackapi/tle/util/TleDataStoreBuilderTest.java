@@ -121,7 +121,7 @@ class TleDataStoreBuilderTest {
         assertEquals(25544, issWithoutName.getTleMapByInternationalDesignator().get("98067A").getSatelliteNumber());
     }
 
-    @DisplayName("Compare TLE's fetched by Satellite Id and International Designator")
+    @DisplayName("Compare TLEs fetched by Satellite Id and International Designator")
     @Test
     void compareTles1() {
         TLEPlus byId = issWithoutName.getTleMapBySatelliteId().get(25544);

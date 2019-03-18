@@ -4,8 +4,6 @@ plugins {
 }
 
 apply plugin: 'java'
-apply plugin: 'eclipse'
-apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 
 group = 'com.ultimalabs'
@@ -16,11 +14,18 @@ repositories {
 	mavenCentral()
 }
 
+configurations {
+	developmentOnly
+	runtimeClasspath {
+		extendsFrom developmentOnly
+	}
+}
+
 dependencies {
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	implementation('org.springframework.boot:spring-boot-starter-actuator')
-	// implementation('org.springframework.boot:spring-boot-starter-security')
 	implementation('org.springframework.boot:spring-boot-starter-web')
-	runtimeOnly('org.springframework.boot:spring-boot-devtools')
+	// implementation('org.springframework.boot:spring-boot-starter-security')
 	compileOnly 'org.projectlombok:lombok:1.18.6'
 	annotationProcessor 'org.projectlombok:lombok:1.18.6'	
 	compile 'org.orekit:orekit:9.3'
