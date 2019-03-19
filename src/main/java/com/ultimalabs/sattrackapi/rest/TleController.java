@@ -12,14 +12,12 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
- * Sat Track REST controller
- *
- * @author Darko Topolko
+ * TLE REST controller
  */
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/v1/tle")
+@RequestMapping("/api/v1/tles")
 public class TleController {
 
     /**
@@ -27,9 +25,9 @@ public class TleController {
      */
     private final TleFetcherService tleFetcherService;
 
-    @GetMapping("/satelliteNumber/{id}")
-    public String getTleByNumber(@PathVariable int id) {
-        TLEPlus tle = tleFetcherService.getTleBySatelliteId(id);
+    @GetMapping("/satNum/{satNum}")
+    public String getTleByNumber(@PathVariable int satNum) {
+        TLEPlus tle = tleFetcherService.getTleBySatelliteId(satNum);
 
         if (tle == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
@@ -39,7 +37,7 @@ public class TleController {
 
     }
 
-    @GetMapping("/internationalDesignator/{designator}")
+    @GetMapping("/id/{designator}")
     public String getTleByInternationalDesignator(@PathVariable String designator) {
 
         TLEPlus tle = tleFetcherService.getTleByInternationalDesignator(designator);

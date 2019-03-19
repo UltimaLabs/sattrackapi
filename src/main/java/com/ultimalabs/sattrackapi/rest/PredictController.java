@@ -9,14 +9,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Sat Track REST controller
- *
- * @author Darko Topolko
+ * Predict REST controller
  */
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/v1/predict")
+@RequestMapping("/api/v1/events")
 public class PredictController {
 
     /**
@@ -24,22 +22,19 @@ public class PredictController {
      */
     private final PredictService predictService;
 
-    @GetMapping("/satelliteNumber/{id}/lon/{lon}/lat/{lat}/alt/{alt}/minEl/{minEl}")
-    public String visibilityBySatNum(@PathVariable int id, @PathVariable double lon,
-                                     @PathVariable double lat, @PathVariable double alt,
+    @GetMapping("/satNum/{satNum}/lat/{lat}/lon/{lon}/alt/{alt}/minEl/{minEl}")
+    public String visibilityBySatNum(@PathVariable int satNum, @PathVariable double lat,
+                                     @PathVariable double lon, @PathVariable double alt,
                                      @PathVariable double minEl) {
-        predictService.visibilityBySatelliteNumber(id, lon, lat, alt, minEl);
-        return "Ok.";
-
+        return predictService.visibilityBySatelliteNumber(satNum, lat, lon, alt, minEl);
     }
 
-    @GetMapping("/internationalDesignator/{designator}/lon/{lon}/lat/{lat}/alt/{alt}/minEl/{minEl}")
+    @GetMapping("/id/{designator}/lat/{lat}/lon/{lon}/alt/{alt}/minEl/{minEl}")
     public String visibilityByInternationalDesignator(@PathVariable String designator,
-                                                      @PathVariable double lon, @PathVariable double lat,
+                                                      @PathVariable double lat, @PathVariable double lon,
                                                       @PathVariable double alt, @PathVariable double minEl) {
 
-        predictService.visibilityByInternationalDesignator(designator, lon, lat, alt, minEl);
-        return "Ok.";
+        return predictService.visibilityByInternationalDesignator(designator, lat, lon, alt, minEl);
     }
 
 }
