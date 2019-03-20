@@ -22,7 +22,7 @@ public class PassesController {
      */
     private final PredictService predictService;
 
-    @GetMapping("/id/{searchString}/lat/{lat}/lon/{lon}/alt/{alt}/minEl/{minEl}")
+    @GetMapping("/{searchString}/lat/{lat}/lon/{lon}/alt/{alt}/minEl/{minEl}")
     public String visibilityByInternationalDesignator(@PathVariable String searchString,
                                                       @PathVariable double lat, @PathVariable double lon,
                                                       @PathVariable double alt, @PathVariable double minEl) {

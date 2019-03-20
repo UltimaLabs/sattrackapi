@@ -23,7 +23,7 @@ public class PositionController {
      */
     private final PositionService positionService;
 
-    @GetMapping("/{searchString}/")
+    @GetMapping("/{searchString}")
     public SatellitePosition getPosition(@PathVariable String searchString) {
         return positionService.getPosition(searchString);
     }

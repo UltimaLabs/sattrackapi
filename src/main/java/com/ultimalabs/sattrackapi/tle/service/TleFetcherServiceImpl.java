@@ -60,8 +60,8 @@ public class TleFetcherServiceImpl implements TleFetcherService {
         }
 
         // longer International Designator variant, maybe
-        if (searchString.charAt('4') == '-') {
-            String shortDesignator = searchString.substring(2, 3) + searchString.substring(5);
+        if (searchString.charAt(4) == '-') {
+            String shortDesignator = searchString.substring(2, 4) + searchString.substring(5);
             return getTleByInternationalDesignator(shortDesignator);
         }
 
