@@ -59,6 +59,8 @@ public class PredictServiceImpl implements PredictService {
     }
 
     private String getNextEvent(TLEPlus tle, double lon, double lat, double alt, double minEl) {
+
+
         return null;
     }
 
