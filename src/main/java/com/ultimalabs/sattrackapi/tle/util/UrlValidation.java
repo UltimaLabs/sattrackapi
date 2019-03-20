@@ -5,7 +5,7 @@ import org.apache.commons.validator.routines.UrlValidator;
 /**
  * URL validation utility class
  */
-public class UrlValidation {
+class UrlValidation {
     private static String[] schemes = {"http", "https"};
     private static UrlValidator urlValidator = new UrlValidator(schemes);
 
@@ -19,7 +19,7 @@ public class UrlValidation {
      * @param url URL passed as a String
      * @return true if URL is valid
      */
-    public static boolean isValid(String url) {
+    static boolean isValid(String url) {
 
         return urlValidator.isValid(url);
 

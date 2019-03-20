@@ -25,7 +25,7 @@ import java.util.Date;
 
 /**
  * Position service
- *
+ * <p>
  * Calculates satellite's position.
  */
 @Slf4j
@@ -61,7 +61,7 @@ public class PositionServiceImpl implements PositionService {
      */
     private SatellitePosition calculatePosition(TLEPlus tle) {
 
-        final BodyShape earth = new OneAxisEllipsoid(EarthParams.equatorialRadius, EarthParams.flattening, EarthParams.iers2010Frame);
+        final BodyShape earth = new OneAxisEllipsoid(EarthParams.EQUATORIAL_RADIUS, EarthParams.FLATTENING, EarthParams.iers2010Frame);
         // observer/ground station coordinates are irrelevant in this context
         final GeodeticPoint station = new GeodeticPoint(FastMath.toRadians(0), FastMath.toRadians(0), 0);
         final TopocentricFrame stationFrame = new TopocentricFrame(earth, station, "ground station");
@@ -88,8 +88,7 @@ public class PositionServiceImpl implements PositionService {
      */
     private GeodeticPoint convertToGeodeticPoint(final SpacecraftState state,
                                                  final TopocentricFrame frame,
-                                                 final BodyShape body)
-            throws OrekitException {
+                                                 final BodyShape body) {
 
         Vector3D pos = state.getPVCoordinates(frame).getPosition();
         return body.transform(pos, frame, state.getDate());

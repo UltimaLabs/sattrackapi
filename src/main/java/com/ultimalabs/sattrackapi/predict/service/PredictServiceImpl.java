@@ -4,10 +4,6 @@ import com.ultimalabs.sattrackapi.tle.model.TLEPlus;
 import com.ultimalabs.sattrackapi.tle.service.TleFetcherService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.orekit.frames.Frame;
-import org.orekit.frames.FramesFactory;
-import org.orekit.utils.Constants;
-import org.orekit.utils.IERSConventions;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -24,21 +20,6 @@ public class PredictServiceImpl implements PredictService {
      * TLE fetcher service
      */
     private final TleFetcherService tleFetcherService;
-
-    /**
-     * Equatorial radius in meters
-     */
-    private final double equatorialRadius = Constants.WGS84_EARTH_EQUATORIAL_RADIUS;
-
-    /**
-     * Earth flattening
-     */
-    private final double earthFlattening = Constants.WGS84_EARTH_FLATTENING;
-
-    /**
-     * Earth frame
-     */
-    private final Frame earthFrame = FramesFactory.getITRF(IERSConventions.IERS_2010, true);
 
     /**
      * Returns next visibility event
@@ -59,8 +40,6 @@ public class PredictServiceImpl implements PredictService {
     }
 
     private String getNextEvent(TLEPlus tle, double lon, double lat, double alt, double minEl) {
-
-
         return null;
     }
 

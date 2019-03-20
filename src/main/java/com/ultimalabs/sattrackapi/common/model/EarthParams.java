@@ -8,22 +8,26 @@ import org.orekit.utils.IERSConventions;
 /**
  * Earth parameters
  * <p>
- * Holds equatorial radius, flattening and Earth frame
+ * Holds equatorial radius, FLATTENING and Earth frame
  */
 public class EarthParams {
+
+    private EarthParams() {
+        throw new IllegalStateException("Utility class");
+    }
 
     /**
      * Equatorial radius in meters
      */
-    public final static double equatorialRadius = Constants.WGS84_EARTH_EQUATORIAL_RADIUS;
+    public static final double EQUATORIAL_RADIUS = Constants.WGS84_EARTH_EQUATORIAL_RADIUS;
 
     /**
-     * Earth flattening
+     * Earth FLATTENING
      */
-    public final static double flattening = Constants.WGS84_EARTH_FLATTENING;
+    public static final double FLATTENING = Constants.WGS84_EARTH_FLATTENING;
 
     /**
      * Earth frame
      */
-    public final static Frame iers2010Frame = FramesFactory.getITRF(IERSConventions.IERS_2010, true);
+    public static final Frame iers2010Frame = FramesFactory.getITRF(IERSConventions.IERS_2010, true);
 }
