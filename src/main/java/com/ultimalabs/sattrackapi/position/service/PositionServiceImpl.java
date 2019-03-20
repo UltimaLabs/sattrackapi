@@ -28,6 +28,8 @@ import java.util.Date;
 
 /**
  * Position service
+ *
+ * Calculates satellite's position.
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -54,25 +56,28 @@ public class PositionServiceImpl implements PositionService {
      */
     private final Frame earthFrame = FramesFactory.getITRF(IERSConventions.IERS_2010, true);
 
+    /**
+     * Returns a satellite's position
+     *
+     * @param searchString Satellite Number or International Designator
+     * @return satellite's position or null if satellite can't be found
+     */
     @Override
-    public SatellitePosition positionBySatelliteNumber(int satNum) {
-        TLEPlus tle = tleFetcherService.getTleBySatelliteId(satNum);
+    public SatellitePosition getPosition(String searchString) {
+        TLEPlus tle = tleFetcherService.getTle(searchString);
         if (tle == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
-        return getPosition(tle);
+        return calculatePosition(tle);
     }
 
-    @Override
-    public SatellitePosition positionByInternationalDesignator(String intDesignator) {
-        TLEPlus tle = tleFetcherService.getTleByInternationalDesignator(intDesignator);
-        if (tle == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
-        return getPosition(tle);
-    }
-
-    private SatellitePosition getPosition(TLEPlus tle) {
+    /**
+     * Calculates satellite's position
+     *
+     * @param tle TLE object
+     * @return position object
+     */
+    private SatellitePosition calculatePosition(TLEPlus tle) {
 
         final BodyShape earth = new OneAxisEllipsoid(equatorialRadius, earthFlattening, earthFrame);
         // observer coordinates are irrelevant in this context

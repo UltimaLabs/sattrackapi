@@ -41,35 +41,17 @@ public class PredictServiceImpl implements PredictService {
     private final Frame earthFrame = FramesFactory.getITRF(IERSConventions.IERS_2010, true);
 
     /**
-     * Predict next event of satellite given by Satellite Number
+     * Predict next visibility event
      *
-     * @param satNum       Satellite Number
+     * @param searchString Satellite Number or International Designator
      * @param longitude    observer longitude
      * @param latitude     observer latitude
      * @param altitude     observer altitude
      * @param minElevation minimal elevation
      */
     @Override
-    public String visibilityBySatelliteNumber(int satNum, double longitude, double latitude, double altitude, double minElevation) {
-        TLEPlus tle = tleFetcherService.getTleBySatelliteId(satNum);
-        if (tle == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
-        return getNextEvent(tle, longitude, latitude, altitude, minElevation);
-    }
-
-    /**
-     * Predict next event of satellite given by International Designator
-     *
-     * @param intDesignator International Designator
-     * @param longitude     observer longitude
-     * @param latitude      observer latitude
-     * @param altitude      observer altitude
-     * @param minElevation  minimal elevation
-     */
-    @Override
-    public String visibilityByInternationalDesignator(String intDesignator, double longitude, double latitude, double altitude, double minElevation) {
-        TLEPlus tle = tleFetcherService.getTleByInternationalDesignator(intDesignator);
+    public String getVisibility(String searchString, double longitude, double latitude, double altitude, double minElevation) {
+        TLEPlus tle = tleFetcherService.getTle(searchString);
         if (tle == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }

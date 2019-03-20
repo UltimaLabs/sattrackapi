@@ -25,9 +25,9 @@ public class TleController {
      */
     private final TleFetcherService tleFetcherService;
 
-    @GetMapping("/satNum/{satNum}")
-    public String getTleByNumber(@PathVariable int satNum) {
-        TLEPlus tle = tleFetcherService.getTleBySatelliteId(satNum);
+    @GetMapping("/{searchString}")
+    public String getTleByNumber(@PathVariable String searchString) {
+        TLEPlus tle = tleFetcherService.getTle(searchString);
 
         if (tle == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
@@ -36,17 +36,4 @@ public class TleController {
         return tle.getTle();
 
     }
-
-    @GetMapping("/id/{designator}")
-    public String getTleByInternationalDesignator(@PathVariable String designator) {
-
-        TLEPlus tle = tleFetcherService.getTleByInternationalDesignator(designator);
-
-        if (tle == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
-
-        return tle.getTle();
-    }
-
 }

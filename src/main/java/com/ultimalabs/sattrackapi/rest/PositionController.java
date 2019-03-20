@@ -19,18 +19,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class PositionController {
 
     /**
-     * Predict service
+     * Position service
      */
     private final PositionService positionService;
 
-    @GetMapping("/satNum/{satNum}")
-    public SatellitePosition positionBySatNum(@PathVariable int satNum) {
-        return positionService.positionBySatelliteNumber(satNum);
-    }
-
-    @GetMapping("/id/{designator}/")
-    public SatellitePosition positionByInternationalDesignator(@PathVariable String designator) {
-        return positionService.positionByInternationalDesignator(designator);
+    @GetMapping("/{searchString}/")
+    public SatellitePosition getPosition(@PathVariable String searchString) {
+        return positionService.getPosition(searchString);
     }
 
 }

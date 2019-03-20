@@ -36,6 +36,41 @@ public class TleFetcherServiceImpl implements TleFetcherService {
     private final SatTrackConfig config;
 
     /**
+     * Search for TLE
+     * <p>
+     * Searches for TLE based on search string which can contain
+     * either Satellite Number or an International Designator (shorter
+     * variant with two-digit year without dash or a four-digit year
+     * with dash).
+     *
+     * @param searchString
+     * @return TLE or null if TLE was not found
+     */
+    @Override
+    public TLEPlus getTle(String searchString) {
+
+        // Satellite Number
+        if (TleFetcherServiceImpl.isInteger(searchString)) {
+            return getTleBySatelliteId(Integer.parseInt(searchString));
+        }
+
+        // invalid International Designator
+        if (searchString.length() < 6) {
+            return null;
+        }
+
+        // longer International Designator variant, maybe
+        if (searchString.charAt('4') == '-') {
+            String shortDesignator = searchString.substring(2, 3) + searchString.substring(5);
+            return getTleByInternationalDesignator(shortDesignator);
+        }
+
+        // shorter International Designator variant
+        return getTleByInternationalDesignator(searchString);
+
+    }
+
+    /**
      * Get the TLE by Satellite Catalog Number
      *
      * @param id Satellite Catalog Number
@@ -46,7 +81,6 @@ public class TleFetcherServiceImpl implements TleFetcherService {
         if (tleStore == null) {
             return null;
         }
-
         return tleStore.getTleMapBySatelliteId().get(id);
     }
 
@@ -61,7 +95,6 @@ public class TleFetcherServiceImpl implements TleFetcherService {
         if (tleStore == null) {
             return null;
         }
-
         return tleStore.getTleMapByInternationalDesignator().get(designator);
     }
 
@@ -97,6 +130,29 @@ public class TleFetcherServiceImpl implements TleFetcherService {
 
         tleStore = TleDataStoreBuilder.buildTleMaps(tleTextData);
 
+    }
+
+    /**
+     * Checks whether string contains a valid non-negative integer
+     *
+     * @param str string to check
+     * @return true if string is an integer, false otherwise
+     */
+    private static boolean isInteger(String str) {
+        if (str == null) {
+            return false;
+        }
+        if (str.isEmpty()) {
+            return false;
+        }
+
+        for (int i = 0; i < str.length(); i++) {
+            char c = str.charAt(i);
+            if (c < '0' || c > '9') {
+                return false;
+            }
+        }
+        return true;
     }
 
 }
