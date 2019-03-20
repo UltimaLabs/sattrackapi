@@ -80,7 +80,7 @@ public class PositionServiceImpl implements PositionService {
     private SatellitePosition calculatePosition(TLEPlus tle) {
 
         final BodyShape earth = new OneAxisEllipsoid(equatorialRadius, earthFlattening, earthFrame);
-        // observer coordinates are irrelevant in this context
+        // observer/ground station coordinates are irrelevant in this context
         final GeodeticPoint station = new GeodeticPoint(FastMath.toRadians(0), FastMath.toRadians(0), 0);
         final TopocentricFrame stationFrame = new TopocentricFrame(earth, station, "ground station");
 

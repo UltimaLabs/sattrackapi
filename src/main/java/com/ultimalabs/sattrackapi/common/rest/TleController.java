@@ -1,4 +1,4 @@
-package com.ultimalabs.sattrackapi.rest;
+package com.ultimalabs.sattrackapi.common.rest;
 
 import com.ultimalabs.sattrackapi.tle.model.TLEPlus;
 import com.ultimalabs.sattrackapi.tle.service.TleFetcherService;

@@ -1,4 +1,4 @@
-package com.ultimalabs.sattrackapi.config;
+package com.ultimalabs.sattrackapi.common.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

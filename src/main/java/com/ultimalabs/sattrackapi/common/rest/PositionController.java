@@ -1,4 +1,4 @@
-package com.ultimalabs.sattrackapi.rest;
+package com.ultimalabs.sattrackapi.common.rest;
 
 import com.ultimalabs.sattrackapi.position.model.SatellitePosition;
 import com.ultimalabs.sattrackapi.position.service.PositionService;

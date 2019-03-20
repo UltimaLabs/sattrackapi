@@ -1,6 +1,6 @@
 package com.ultimalabs.sattrackapi.tle.service;
 
-import com.ultimalabs.sattrackapi.config.SatTrackConfig;
+import com.ultimalabs.sattrackapi.common.config.SatTrackConfig;
 import com.ultimalabs.sattrackapi.tle.model.TLEPlus;
 import com.ultimalabs.sattrackapi.tle.model.TleDataStore;
 import com.ultimalabs.sattrackapi.tle.util.TleDataStoreBuilder;

@@ -41,7 +41,7 @@ public class PredictServiceImpl implements PredictService {
     private final Frame earthFrame = FramesFactory.getITRF(IERSConventions.IERS_2010, true);
 
     /**
-     * Predict next visibility event
+     * Returns next visibility event
      *
      * @param searchString Satellite Number or International Designator
      * @param longitude    observer longitude
