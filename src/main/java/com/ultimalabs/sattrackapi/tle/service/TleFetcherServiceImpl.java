@@ -43,7 +43,7 @@ public class TleFetcherServiceImpl implements TleFetcherService {
      * variant with two-digit year without dash or a four-digit year
      * with dash).
      *
-     * @param searchString
+     * @param searchString Satellite Number or International designator
      * @return TLE or null if TLE was not found
      */
     @Override
@@ -125,7 +125,15 @@ public class TleFetcherServiceImpl implements TleFetcherService {
         List<String> tleTextData = new ArrayList<>();
 
         for (String tleUrl : config.getTleUrls()) {
-            tleTextData.addAll(UrlDataReader.readStringDataFromUrl(tleUrl));
+
+            List<String> tleStrings = UrlDataReader.readStringDataFromUrl(tleUrl);
+
+            if (tleStrings.isEmpty()) {
+                log.error("There was an error fetching TLE data from " + tleUrl + ". TLE data refresh canceled.");
+                return;
+            }
+
+            tleTextData.addAll(tleStrings);
         }
 
         tleStore = TleDataStoreBuilder.buildTleMaps(tleTextData);
