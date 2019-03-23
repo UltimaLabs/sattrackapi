@@ -6,31 +6,31 @@ import lombok.Data;
  * Satellite pass details
  */
 @Data
-public class PassEventEntry {
+public class PassEventDetailsEntry {
 
     /**
      * Date and time for this data item
      */
-    private String time;
+    private final String t;
 
     /**
      * Azimuth
      */
-    private double az;
+    private final double az;
 
     /**
      * Elevation
      */
-    private double el;
+    private final double el;
 
     /**
      * Range, in kilometers
      */
-    private int range;
+    private final double rng;
 
     /**
      * Doppler shift, in Hz
      */
-    private int doppler;
+    private final double dop;
 
 }

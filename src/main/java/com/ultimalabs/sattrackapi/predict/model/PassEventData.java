@@ -38,6 +38,6 @@ public class PassEventData {
     /**
      * Pass event entries
      */
-    private final List<PassEventEntry> eventDetails;
+    private final List<PassEventDetailsEntry> eventDetails;
 
 }
