@@ -2,7 +2,6 @@ package com.ultimalabs.sattrackapi.predict.model;
 
 import lombok.Data;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -14,26 +13,31 @@ public class PassEventData {
     /**
      * Current date and time
      */
-    private Date now;
+    private final String now;
+
+    /**
+     * Wait time for the rise event (rise - now), in seconds
+     */
+    private final Double wait;
 
     /**
      * Satellite rise time
      */
-    private Date rise;
+    private final String rise;
 
     /**
      * Satellite set time
      */
-    private Date set;
+    private final String set;
 
     /**
-     * Pass duration
+     * Pass duration, in seconds
      */
-    private double duration;
+    private final double duration;
 
     /**
-     * Pass details
+     * Pass event entries
      */
-    private List<PassEventDetails> details;
+    private final List<PassEventEntry> eventDetails;
 
 }

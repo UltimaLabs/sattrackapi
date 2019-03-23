@@ -1,6 +1,7 @@
 package com.ultimalabs.sattrackapi.position.service;
 
 import com.ultimalabs.sattrackapi.common.model.EarthParams;
+import com.ultimalabs.sattrackapi.common.util.DoubleRound;
 import com.ultimalabs.sattrackapi.position.model.SatellitePosition;
 import com.ultimalabs.sattrackapi.tle.model.TLEPlus;
 import com.ultimalabs.sattrackapi.tle.service.TleFetcherService;
@@ -72,7 +73,7 @@ public class PositionServiceImpl implements PositionService {
 
         final GeodeticPoint gp = convertToGeodeticPoint(finalState, stationFrame, earth);
 
-        return new SatellitePosition(FastMath.toDegrees(gp.getLatitude()), FastMath.toDegrees(gp.getLongitude()));
+        return new SatellitePosition(DoubleRound.round(FastMath.toDegrees(gp.getLatitude()), 4), DoubleRound.round(FastMath.toDegrees(gp.getLongitude()), 4));
 
     }
 

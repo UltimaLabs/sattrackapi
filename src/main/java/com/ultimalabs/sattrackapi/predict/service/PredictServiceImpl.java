@@ -1,8 +1,11 @@
 package com.ultimalabs.sattrackapi.predict.service;
 
 import com.ultimalabs.sattrackapi.common.model.EarthParams;
+import com.ultimalabs.sattrackapi.common.util.DoubleRound;
+import com.ultimalabs.sattrackapi.predict.model.PassEventData;
 import com.ultimalabs.sattrackapi.tle.model.TLEPlus;
 import com.ultimalabs.sattrackapi.tle.service.TleFetcherService;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hipparchus.util.FastMath;
@@ -21,6 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Collections;
 import java.util.Date;
 
 /**
@@ -46,7 +50,7 @@ public class PredictServiceImpl implements PredictService {
      * @param minElevation minimal elevation
      */
     @Override
-    public String getVisibility(String searchString, double latitude, double longitude, double altitude, double minElevation) {
+    public PassEventData getVisibility(String searchString, double latitude, double longitude, double altitude, double minElevation) {
         TLEPlus tle = tleFetcherService.getTle(searchString);
         if (tle == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
@@ -55,12 +59,11 @@ public class PredictServiceImpl implements PredictService {
         return getNextEvent(tle, latitude, longitude, altitude, minElevation);
     }
 
-    private String getNextEvent(TLEPlus tle, double lat, double lon, double alt, double minEl) {
+    private PassEventData getNextEvent(TLEPlus tle, double lat, double lon, double alt, double minEl) {
 
         AbsoluteDate now = new AbsoluteDate(new Date(), TimeScalesFactory.getUTC());
         TLEPropagator propagator = TLEPropagator.selectExtrapolator(tle);
         propagator.propagate(now);
-        log.info("Now : " + now.getDate());
 
         final BodyShape earth = new OneAxisEllipsoid(EarthParams.EQUATORIAL_RADIUS, EarthParams.FLATTENING, EarthParams.iers2010Frame);
 
@@ -76,35 +79,58 @@ public class PredictServiceImpl implements PredictService {
                         withConstantElevation(elevation).
                         withHandler(new VisibilityHandler());
 
-        // Add event to be detected
         propagator.addEventDetector(visibilityDetector);
+        VisibilityHandler handler = (VisibilityHandler) ((ElevationDetector) visibilityDetector).getHandler();
 
-        // Propagate from the initial date to the first raising or for the fixed duration
-        SpacecraftState finalState = propagator.propagate(now.shiftedBy(259200.));
+        propagator.propagate(now.shiftedBy(259200.));
 
-        log.info("Final state : " + finalState.getDate());
+        // TODO add test for no rise event
+        if (handler.getRise() == null) {
+            return null;
+        }
 
-        return null;
+        // TODO add test for event with rise only
+        if (handler.getSet() == null) {
+            return null;
+        }
+
+        return new PassEventData(
+                now.getDate().toString(),
+                DoubleRound.round(handler.getRise().offsetFrom(now, TimeScalesFactory.getUTC()), 2),
+                handler.getRise().toString(),
+                handler.getSet().toString(),
+                DoubleRound.round(handler.getSet().offsetFrom(handler.getRise(), TimeScalesFactory.getUTC()), 2),
+                Collections.emptyList()
+        );
+
     }
 
     /**
      * Handler for visibility event
      */
+    @Getter
     private static class VisibilityHandler implements EventHandler<ElevationDetector> {
+
+        /**
+         * Satellite rise time
+         */
+        private AbsoluteDate rise;
+
+        /**
+         * Satellite set time
+         */
+        private AbsoluteDate set;
 
         public Action eventOccurred(final SpacecraftState s, final ElevationDetector detector,
                                     final boolean increasing) {
             if (increasing) {
-                log.info("Visibility on " + detector.getTopocentricFrame().getName()
-                        + " begins at " + s.getDate());
+                this.rise = s.getDate();
                 return Action.CONTINUE;
             } else {
-                log.info("Visibility on " + detector.getTopocentricFrame().getName()
-                        + " ends at " + s.getDate());
+                this.set = s.getDate();
                 return Action.STOP;
             }
         }
-
     }
 
 }

@@ -1,4 +1,4 @@
-package com.ultimalabs.sattrackapi.tle.util;
+package com.ultimalabs.sattrackapi.common.util;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

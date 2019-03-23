@@ -1,5 +1,6 @@
 package com.ultimalabs.sattrackapi.common.rest;
 
+import com.ultimalabs.sattrackapi.predict.model.PassEventData;
 import com.ultimalabs.sattrackapi.predict.service.PredictService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,9 +24,9 @@ public class PassesController {
     private final PredictService predictService;
 
     @GetMapping("/{searchString}/lat/{lat}/lon/{lon}/alt/{alt}/minEl/{minEl}")
-    public String visibilityByInternationalDesignator(@PathVariable String searchString,
-                                                      @PathVariable double lat, @PathVariable double lon,
-                                                      @PathVariable double alt, @PathVariable double minEl) {
+    public PassEventData visibilityByInternationalDesignator(@PathVariable String searchString,
+                                                             @PathVariable double lat, @PathVariable double lon,
+                                                             @PathVariable double alt, @PathVariable double minEl) {
 
         return predictService.getVisibility(searchString, lat, lon, alt, minEl);
     }

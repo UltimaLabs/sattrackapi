@@ -1,4 +1,4 @@
-package com.ultimalabs.sattrackapi.tle.util;
+package com.ultimalabs.sattrackapi.common.util;
 
 import lombok.extern.slf4j.Slf4j;
 

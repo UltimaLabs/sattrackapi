@@ -1,7 +1,9 @@
 package com.ultimalabs.sattrackapi.predict.service;
 
+import com.ultimalabs.sattrackapi.predict.model.PassEventData;
+
 public interface PredictService {
 
-    String getVisibility(String searchString, double longitude, double latitude, double altitude, double minElevation);
+    PassEventData getVisibility(String searchString, double longitude, double latitude, double altitude, double minElevation);
 
 }
