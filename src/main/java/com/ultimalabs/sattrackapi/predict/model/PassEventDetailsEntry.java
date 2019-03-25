@@ -24,9 +24,9 @@ public class PassEventDetailsEntry {
     private final double el;
 
     /**
-     * Range, in kilometers
+     * Distance, in meters
      */
-    private final double rng;
+    private final double dst;
 
     /**
      * Doppler shift, in Hz

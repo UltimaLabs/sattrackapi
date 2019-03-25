@@ -86,29 +86,27 @@ public class PredictServiceImpl implements PredictService {
                         withHandler(new VisibilityHandler());
 
         propagator.addEventDetector(visibilityDetector);
-        VisibilityHandler handler = (VisibilityHandler) ((ElevationDetector) visibilityDetector).getHandler();
+        VisibilityHandler visibilityHandler = (VisibilityHandler) ((ElevationDetector) visibilityDetector).getHandler();
 
         propagator.propagate(now.shiftedBy(259200.));
 
         // TODO add test for no rise event
-        if (handler.getRise() == null) {
-            log.info("No rise date.");
+        if (visibilityHandler.getRise() == null) {
             return null;
         }
 
         // TODO add test for event with rise only
-        if (handler.getSet() == null) {
-            log.info("No set date.");
+        if (visibilityHandler.getSet() == null) {
             return null;
         }
 
-        AbsoluteDate riseDate = handler.getRise();
-        AbsoluteDate setDate = handler.getSet();
+        AbsoluteDate riseDate = visibilityHandler.getRise();
+        AbsoluteDate setDate = visibilityHandler.getSet();
 
         TLEPropagator masterModePropagator = TLEPropagator.selectExtrapolator(tle);
         masterModePropagator.propagate(riseDate);
         StepHandler stepHandler = new StepHandler(observerFrame);
-        masterModePropagator.setMasterMode(5, stepHandler);
+        masterModePropagator.setMasterMode(30, stepHandler);
         masterModePropagator.propagate(setDate);
 
         return new PassEventData(
@@ -190,17 +188,21 @@ public class PredictServiceImpl implements PredictService {
             Vector3D velocity = pv.getVelocity();
 
             // extract pointing data
-            double azimuth = FastMath.toDegrees(position.getAlpha());
+            double azimuth = FastMath.toDegrees(position.getAlpha() * -1.) + 90;
+
+            if (azimuth < 0.) {
+                azimuth += 360.;
+            }
+
             double elevation = FastMath.toDegrees(position.getDelta());
-            double range = currentState.getPVCoordinates(observerFrame).getPosition().getNorm();
+            double distance = currentState.getPVCoordinates(observerFrame).getPosition().getNorm();
             double doppler = position.normalize().dotProduct(velocity);
 
-            // TODO calculate range
             passDetails.add(new PassEventDetailsEntry(
                     currentState.getDate().toString(),
                     DoubleRound.round(azimuth, 2),
                     DoubleRound.round(elevation, 2),
-                    DoubleRound.round(range, 0),
+                    DoubleRound.round(distance, 0),
                     DoubleRound.round(doppler, 0)
             ));
 
