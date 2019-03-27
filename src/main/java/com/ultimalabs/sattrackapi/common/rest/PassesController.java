@@ -24,11 +24,21 @@ public class PassesController {
     private final PredictService predictService;
 
     @GetMapping("/{searchString}/lat/{lat}/lon/{lon}/alt/{alt}/minEl/{minEl}")
-    public PassEventData visibilityByInternationalDesignator(@PathVariable String searchString,
-                                                             @PathVariable double lat, @PathVariable double lon,
-                                                             @PathVariable double alt, @PathVariable double minEl) {
+    public PassEventData passWithoutDetails(
+            @PathVariable String searchString,
+            @PathVariable double lat, @PathVariable double lon,
+            @PathVariable double alt, @PathVariable double minEl,
+            @PathVariable double resolution) {
+        return predictService.getNextEventWithoutDetails(searchString, lat, lon, alt, minEl);
+    }
 
-        return predictService.getVisibility(searchString, lat, lon, alt, minEl);
+    @GetMapping("/{searchString}/lat/{lat}/lon/{lon}/alt/{alt}/minEl/{minEl}/step/{stepSize}")
+    public PassEventData passWithDetails(
+            @PathVariable String searchString,
+            @PathVariable double lat, @PathVariable double lon,
+            @PathVariable double alt, @PathVariable double minEl,
+            @PathVariable double stepSize) {
+        return predictService.getNextEventWithDetails(searchString, lat, lon, alt, minEl, stepSize);
     }
 
 }

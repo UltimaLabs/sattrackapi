@@ -47,25 +47,38 @@ public class PredictServiceImpl implements PredictService {
     private final TleFetcherService tleFetcherService;
 
     /**
-     * Returns next visibility event
+     * Returns next visibility event with pass details
      *
      * @param searchString Satellite Number or International Designator
      * @param longitude    observer longitude
      * @param latitude     observer latitude
      * @param altitude     observer altitude
      * @param minElevation minimal elevation
+     * @param stepSize     step resolution for the master mode propagator
+     * @return next visibility event, with details
      */
     @Override
-    public PassEventData getVisibility(String searchString, double latitude, double longitude, double altitude, double minElevation) {
+    public PassEventData getNextEventWithDetails(String searchString, double latitude, double longitude, double altitude, double minElevation, double stepSize) {
         TLEPlus tle = tleFetcherService.getTle(searchString);
         if (tle == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
 
-        return getNextEvent(tle, latitude, longitude, altitude, minElevation);
+        return getNextEvent(tle, latitude, longitude, altitude, minElevation, stepSize);
     }
 
-    private PassEventData getNextEvent(TLEPlus tle, double lat, double lon, double alt, double minEl) {
+    @Override
+    public PassEventData getNextEventWithoutDetails(String searchString, double latitude, double longitude, double altitude, double minElevation) {
+        TLEPlus tle = tleFetcherService.getTle(searchString);
+        if (tle == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+
+        return null;
+
+    }
+
+    private PassEventData getNextEvent(TLEPlus tle, double lat, double lon, double alt, double minEl, double stepSize) {
 
         AbsoluteDate now = new AbsoluteDate(new Date(), TimeScalesFactory.getUTC());
         TLEPropagator propagator = TLEPropagator.selectExtrapolator(tle);
@@ -88,7 +101,8 @@ public class PredictServiceImpl implements PredictService {
         propagator.addEventDetector(visibilityDetector);
         VisibilityHandler visibilityHandler = (VisibilityHandler) ((ElevationDetector) visibilityDetector).getHandler();
 
-        propagator.propagate(now.shiftedBy(259200.));
+        // Propagate from now to the first raising or for the fixed duration of 48 hours
+        propagator.propagate(now.shiftedBy(172800.));
 
         // TODO add test for no rise event
         if (visibilityHandler.getRise() == null) {
@@ -106,7 +120,7 @@ public class PredictServiceImpl implements PredictService {
         TLEPropagator masterModePropagator = TLEPropagator.selectExtrapolator(tle);
         masterModePropagator.propagate(riseDate);
         StepHandler stepHandler = new StepHandler(observerFrame);
-        masterModePropagator.setMasterMode(30, stepHandler);
+        masterModePropagator.setMasterMode(stepSize, stepHandler);
         masterModePropagator.propagate(setDate);
 
         return new PassEventData(
