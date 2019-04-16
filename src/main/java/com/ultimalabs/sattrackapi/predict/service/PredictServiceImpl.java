@@ -19,7 +19,6 @@ import org.orekit.frames.Transform;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.propagation.analytical.tle.TLEPropagator;
 import org.orekit.propagation.events.ElevationDetector;
-import org.orekit.propagation.events.EventDetector;
 import org.orekit.propagation.events.handlers.EventHandler;
 import org.orekit.propagation.sampling.OrekitFixedStepHandler;
 import org.orekit.time.AbsoluteDate;
@@ -30,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -46,6 +46,11 @@ public class PredictServiceImpl implements PredictService {
      */
     private final TleFetcherService tleFetcherService;
 
+    @Override
+    public PassEventData getNextEventWithoutDetails(String searchString, double latitude, double longitude, double altitude, double minElevation) {
+        return getEventData(getTle(searchString), latitude, longitude, altitude, minElevation, 0.);
+    }
+
     /**
      * Returns next visibility event with pass details
      *
@@ -59,26 +64,37 @@ public class PredictServiceImpl implements PredictService {
      */
     @Override
     public PassEventData getNextEventWithDetails(String searchString, double latitude, double longitude, double altitude, double minElevation, double stepSize) {
+        return getEventData(getTle(searchString), latitude, longitude, altitude, minElevation, stepSize);
+    }
+
+    /**
+     * Returns TLE object based on search string
+     *
+     * @param searchString Satellite Number or International Designator
+     * @return TLE object
+     */
+    private TLEPlus getTle(String searchString) {
         TLEPlus tle = tleFetcherService.getTle(searchString);
         if (tle == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
 
-        return getNextEvent(tle, latitude, longitude, altitude, minElevation, stepSize);
+        return tle;
     }
 
-    @Override
-    public PassEventData getNextEventWithoutDetails(String searchString, double latitude, double longitude, double altitude, double minElevation) {
-        TLEPlus tle = tleFetcherService.getTle(searchString);
-        if (tle == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
-
-        return null;
-
-    }
-
-    private PassEventData getNextEvent(TLEPlus tle, double lat, double lon, double alt, double minEl, double stepSize) {
+    /**
+     * Returns next pass data
+     *
+     * @param tle      TLE object
+     * @param lat      observer latitude
+     * @param lon      observer longitude
+     * @param alt      observer altitude
+     * @param minEl    minimum elevation for visibility event
+     * @param stepSize resolution for pass event details, in seconds;
+     *                 if zero is passed as parameter, no details are returneds
+     * @return pass event data
+     */
+    private PassEventData getEventData(TLEPlus tle, double lat, double lon, double alt, double minEl, double stepSize) {
 
         AbsoluteDate now = new AbsoluteDate(new Date(), TimeScalesFactory.getUTC());
         TLEPropagator propagator = TLEPropagator.selectExtrapolator(tle);
@@ -93,29 +109,38 @@ public class PredictServiceImpl implements PredictService {
         final double maxcheck = 100.0;
         final double threshold = 0.001;
         final double elevation = FastMath.toRadians(minEl);
-        final EventDetector visibilityDetector =
+        final ElevationDetector visibilityDetector =
                 new ElevationDetector(maxcheck, threshold, observerFrame).
                         withConstantElevation(elevation).
                         withHandler(new VisibilityHandler());
 
         propagator.addEventDetector(visibilityDetector);
-        VisibilityHandler visibilityHandler = (VisibilityHandler) ((ElevationDetector) visibilityDetector).getHandler();
+        VisibilityHandler visibilityHandler = (VisibilityHandler) visibilityDetector.getHandler();
 
         // Propagate from now to the first raising or for the fixed duration of 48 hours
         propagator.propagate(now.shiftedBy(172800.));
 
-        // TODO add test for no rise event
         if (visibilityHandler.getRise() == null) {
             return null;
         }
 
-        // TODO add test for event with rise only
         if (visibilityHandler.getSet() == null) {
             return null;
         }
 
         AbsoluteDate riseDate = visibilityHandler.getRise();
         AbsoluteDate setDate = visibilityHandler.getSet();
+
+        if (stepSize == 0.) {
+            return new PassEventData(
+                    now.getDate().toString(),
+                    DoubleRound.round(riseDate.offsetFrom(now, TimeScalesFactory.getUTC()), 2),
+                    riseDate.toString(),
+                    setDate.toString(),
+                    DoubleRound.round(setDate.offsetFrom(riseDate, TimeScalesFactory.getUTC()), 2),
+                    Collections.emptyList()
+            );
+        }
 
         TLEPropagator masterModePropagator = TLEPropagator.selectExtrapolator(tle);
         masterModePropagator.propagate(riseDate);

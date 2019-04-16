@@ -1,4 +1,4 @@
-package com.ultimalabs.sattrackapi.common.rest;
+package com.ultimalabs.sattrackapi.predict.controller;
 
 import com.ultimalabs.sattrackapi.predict.model.PassEventData;
 import com.ultimalabs.sattrackapi.predict.service.PredictService;
@@ -26,18 +26,23 @@ public class PassesController {
     @GetMapping("/{searchString}/lat/{lat}/lon/{lon}/alt/{alt}/minEl/{minEl}")
     public PassEventData passWithoutDetails(
             @PathVariable String searchString,
-            @PathVariable double lat, @PathVariable double lon,
-            @PathVariable double alt, @PathVariable double minEl,
-            @PathVariable double resolution) {
+            @PathVariable double lat,
+            @PathVariable double lon,
+            @PathVariable double alt,
+            @PathVariable double minEl
+    ) {
         return predictService.getNextEventWithoutDetails(searchString, lat, lon, alt, minEl);
     }
 
     @GetMapping("/{searchString}/lat/{lat}/lon/{lon}/alt/{alt}/minEl/{minEl}/step/{stepSize}")
     public PassEventData passWithDetails(
             @PathVariable String searchString,
-            @PathVariable double lat, @PathVariable double lon,
-            @PathVariable double alt, @PathVariable double minEl,
-            @PathVariable double stepSize) {
+            @PathVariable double lat,
+            @PathVariable double lon,
+            @PathVariable double alt,
+            @PathVariable double minEl,
+            @PathVariable double stepSize
+    ) {
         return predictService.getNextEventWithDetails(searchString, lat, lon, alt, minEl, stepSize);
     }
 
