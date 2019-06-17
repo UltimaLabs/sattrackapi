@@ -12,15 +12,12 @@ import org.hipparchus.util.FastMath;
 import org.orekit.bodies.BodyShape;
 import org.orekit.bodies.GeodeticPoint;
 import org.orekit.bodies.OneAxisEllipsoid;
-import org.orekit.errors.OrekitException;
 import org.orekit.frames.TopocentricFrame;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.propagation.analytical.tle.TLEPropagator;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.TimeScalesFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Date;
 
@@ -48,9 +45,6 @@ public class PositionServiceImpl implements PositionService {
     @Override
     public SatellitePosition getPosition(String searchString) {
         TLEPlus tle = tleFetcherService.getTle(searchString);
-        if (tle == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
         return calculatePosition(tle);
     }
 
@@ -85,7 +79,6 @@ public class PositionServiceImpl implements PositionService {
      * @param frame the frame associated with the surface of the body
      * @param body  the body
      * @return the transformed GeodeticPoint
-     * @throws OrekitException
      */
     private GeodeticPoint convertToGeodeticPoint(final SpacecraftState state,
                                                  final TopocentricFrame frame,

@@ -1,3 +1,7 @@
+server:
+  error:
+    includeStacktrace: never
+
 sattrack:
 
   # Orekit data folder
@@ -7,7 +11,7 @@ sattrack:
 
   # cron entry for TLE data refresh, local time (not UTC)
   tleUpdateCron: "0 47 1 * * *"
-  
+
   # TLE source URLs
   tleUrls:
     - https://download.ultimalabs.com/files/tle/amateur.txt

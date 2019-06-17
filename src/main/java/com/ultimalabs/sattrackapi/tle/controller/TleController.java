@@ -4,12 +4,13 @@ import com.ultimalabs.sattrackapi.tle.model.TLEPlus;
 import com.ultimalabs.sattrackapi.tle.service.TleFetcherService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
+
+import javax.validation.constraints.Size;
 
 /**
  * TLE REST controller
@@ -18,6 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/tles")
+@Validated
 public class TleController {
 
     /**
@@ -26,14 +28,10 @@ public class TleController {
     private final TleFetcherService tleFetcherService;
 
     @GetMapping("/{searchString}")
-    public String getTleByNumber(@PathVariable String searchString) {
+    public String getTleByNumber(
+            @Size(min = 5, max = 11, message = "Satellite identifier must be between 5 and 11 characters long")
+            @PathVariable String searchString) {
         TLEPlus tle = tleFetcherService.getTle(searchString);
-
-        if (tle == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
-
         return tle.getTle();
-
     }
 }

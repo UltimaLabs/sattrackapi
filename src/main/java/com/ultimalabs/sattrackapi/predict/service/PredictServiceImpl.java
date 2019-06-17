@@ -24,9 +24,7 @@ import org.orekit.propagation.sampling.OrekitFixedStepHandler;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.TimeScalesFactory;
 import org.orekit.utils.PVCoordinates;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -74,12 +72,7 @@ public class PredictServiceImpl implements PredictService {
      * @return TLE object
      */
     private TLEPlus getTle(String searchString) {
-        TLEPlus tle = tleFetcherService.getTle(searchString);
-        if (tle == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
-
-        return tle;
+        return tleFetcherService.getTle(searchString);
     }
 
     /**

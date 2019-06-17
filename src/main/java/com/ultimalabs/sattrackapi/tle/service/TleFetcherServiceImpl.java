@@ -9,8 +9,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.orekit.data.DataProvidersManager;
 import org.orekit.data.DirectoryCrawler;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
@@ -49,24 +51,33 @@ public class TleFetcherServiceImpl implements TleFetcherService {
     @Override
     public TLEPlus getTle(String searchString) {
 
+        TLEPlus foundTle = null;
+
         // Satellite Number
         if (TleFetcherServiceImpl.isInteger(searchString)) {
-            return getTleBySatelliteId(Integer.parseInt(searchString));
+            foundTle = getTleBySatelliteId(Integer.parseInt(searchString));
         }
 
-        // invalid International Designator
-        if (searchString.length() < 6) {
-            return null;
+        // International Designator
+        if (searchString.length() >= 6) {
+
+            // longer International Designator variant, maybe
+            if (searchString.charAt(4) == '-') {
+                String shortDesignator = searchString.substring(2, 4) + searchString.substring(5);
+                foundTle = getTleByInternationalDesignator(shortDesignator);
+            } else {
+                // shorter International Designator variant
+                foundTle = getTleByInternationalDesignator(searchString);
+            }
         }
 
-        // longer International Designator variant, maybe
-        if (searchString.charAt(4) == '-') {
-            String shortDesignator = searchString.substring(2, 4) + searchString.substring(5);
-            return getTleByInternationalDesignator(shortDesignator);
+
+        if (foundTle == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No satellite matching the given identifier was found.");
         }
 
-        // shorter International Designator variant
-        return getTleByInternationalDesignator(searchString);
+        return foundTle;
+
 
     }
 
