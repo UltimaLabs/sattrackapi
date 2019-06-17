@@ -79,7 +79,7 @@ You can use either the "Satellite Catalog Number" (NORAD ID) or the "Internation
 
 #### Retrieve a satellite TLE data
 
-Retrieve the TLE data for a satellite (ISS - 98067A):
+Retrieve the TLE data for a satellite (ISS - 25544):
 
 http://localhost:8080/api/v1/tles/25544
 
@@ -117,7 +117,9 @@ Event details data includes:
 * `dst` - distance from the observer to the satellite (meters)
 * `dop` - Doppler shift (Hz)
 
-Please note that **all the returned timestamps are UTC**. Requesting client app is responsible for converting timestamps to local time, if needed. 
+There are a couple of important implementation details: 
+* **all returned timestamps are UTC**; requesting client app is responsible for converting timestamps to local time, if needed
+* the app will return an empty result if no pass above `minEl` occurs within the next 48 hours  
 
 Several request examples:
 
