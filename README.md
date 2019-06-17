@@ -32,12 +32,12 @@ Configuration is read at the application startup, so for the configuration chang
 #### Orekit data folder
 
 In order to run the application, you first have to download the [Orekit data files](https://gitlab.orekit.org/orekit/orekit-data/-/archive/master/orekit-data-master.zip).
-Unzip the downloaded file to a folder on your local machine. Edit the `src/main/resources/application.yml` config file and adjust the value of the `orekitDataFolder` variable.
-Please make sure the application can read the files from the specified location.
+Unzip the downloaded data to a folder on your local machine. Edit the `src/main/resources/application.yml` config file and adjust the value of the `orekitDataFolder` variable.
+Please make sure the application has proper access rights for reading the data files.
 
 #### TLE urls
 
-`tleUrls` contains a list of one or more TLE data source URLs.
+`tleUrls` contains a list of one or more TLE data source URLs. TLE data is downloaded, parsed, and stored internally by the application during the startup and refreshed later (see `tleUpdateCron`).
 The ones at `download.ultimalabs.com` are downloaded twice each day, at 09:36 and 21:17, from `www.celestrak.com`.
 They are provided for convenience, so `www.celestrack.com` isn't accessed every time the application is started (which happens often during the development).
 
@@ -75,7 +75,7 @@ By default, the application log is output to `stdout`.
 
 By default, you can access the application at `http://localhost:8080`. You can use a browser, or the free [Postman app](https://www.getpostman.com/downloads/).
 There are several application "modules" you can access. All the API endpoints are accessed using the HTTP GET method.
-You can use either the "Satellite Catalog Number" (NORAD ID) or the "International Designator" (COSPAR Designator) as a satellite identifier ("98067A", "1998-067A" and "25544" are valid identifiers for the ISS).
+You can use either the "Satellite Catalog Number" (NORAD ID) or the "International Designator" (COSPAR Designator) as a satellite identifier ("98067A", "1998-067A" and "25544" are all valid identifiers for the ISS).
 
 #### Retrieve a satellite TLE data
 
@@ -96,10 +96,6 @@ http://localhost:8080/api/v1/positions/98067A
 #### Retrieve next pass data
 
 Retrieves the data for the next pass, with or without the pass details.
-
-```
-http://localhost:8080/api/v1/passes/98067A/lat/46.1613/lon/15.7534/alt/200/minEl/20/step/1
-```
 
 The request parameters are:
 
@@ -126,3 +122,11 @@ Event details data includes:
 - `dop` - Doppler shift (Hz)
 
 Please note that **all the returned timestamps are UTC**. Requesting client app is responsible for converting timestamps to local time, if needed. 
+
+Several request examples:
+
+- [http://localhost:8080/api/v1/passes/98067A/lat/46.1613/lon/15.7534/alt/200/minEl/20/step/1/] (observer: Ultima
+- [http://localhost:8080/api/v1/passes/14037A/lat/64.1333/lon/-21.9333/alt/61/minEl/20/step/5/] (Reykjavik, 5s step)
+- [http://localhost:8080/api/v1/passes/14037A/lat/-36.8405/lon/174.7400/alt/6/minEl/30/step/0.1/] (Auckland, 30 degrees minimum elevation, 0.1 second step)
+- [http://localhost:8080/api/v1/passes/14037A/lat/-22.9083/lon/-43.1964/alt/0/minEl/15/] (Rio de Janeiro, without the details)
+
