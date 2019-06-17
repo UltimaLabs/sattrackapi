@@ -81,17 +81,13 @@ You can use either the "Satellite Catalog Number" (NORAD ID) or the "Internation
 
 Retrieve the TLE data for a satellite (ISS - 98067A):
 
-```
-http://localhost:8080/api/v1/tles/98067A
-```
+http://localhost:8080/api/v1/tles/25544
 
 #### Calculate the nadir
 
 Calculate the nadir at the current time (time of the request) for the given satellite:
 
-```
-http://localhost:8080/api/v1/positions/98067A
-```
+http://localhost:8080/api/v1/positions/25544
 
 #### Retrieve next pass data
 
@@ -99,34 +95,34 @@ Retrieves the data for the next pass, with or without the pass details.
 
 The request parameters are:
 
-- satellite identifier
-- `lat` - observer latitude (degrees)
-- `lon` - observer longitude (degrees)
-- `alt` - observer altitude (meters)
-- `minEl` - minimum elevation threshold; passes with maximum elevation below this limit will be omitted (meters)
-- `step` - step size for the event details data; when omitted, no details are returned (seconds)
+* satellite identifier
+* `lat` - observer latitude (degrees)
+* `lon` - observer longitude (degrees)
+* `alt` - observer altitude (meters)
+* `minEl` - minimum elevation threshold; passes with maximum elevation below this limit will be omitted (meters)
+* `step` - step size for the event details data; when omitted, no details are returned (seconds)
 
 The pass data includes:
-- `now` - the current time
-- `wait` - a number of seconds between `now` and satellite `rise`
-- `rise` - time when the satellite rises above the `minEl`
-- `set` - time when the satellite sets below the `minEl`
-- `duration` - event duration
-- `eventDetails` - event details (if requested), see below
+* `now` - the current time
+* `wait` - a number of seconds between `now` and satellite `rise`
+* `rise` - time when the satellite rises above the `minEl`
+* `set` - time when the satellite sets below the `minEl`
+* `duration` - event duration
+* `eventDetails` - event details (if requested), see below
 
 Event details data includes:
-- `t` - data point timestamp
-- `az` - azimuth
-- `el` - elevation
-- `dst` - distance from the observer to the satellite (meters)
-- `dop` - Doppler shift (Hz)
+* `t` - data point timestamp
+* `az` - azimuth
+* `el` - elevation
+* `dst` - distance from the observer to the satellite (meters)
+* `dop` - Doppler shift (Hz)
 
 Please note that **all the returned timestamps are UTC**. Requesting client app is responsible for converting timestamps to local time, if needed. 
 
 Several request examples:
 
-- [http://localhost:8080/api/v1/passes/98067A/lat/46.1613/lon/15.7534/alt/200/minEl/20/step/1/] (observer: Ultima
-- [http://localhost:8080/api/v1/passes/14037A/lat/64.1333/lon/-21.9333/alt/61/minEl/20/step/5/] (Reykjavik, 5s step)
-- [http://localhost:8080/api/v1/passes/14037A/lat/-36.8405/lon/174.7400/alt/6/minEl/30/step/0.1/] (Auckland, 30 degrees minimum elevation, 0.1 second step)
-- [http://localhost:8080/api/v1/passes/14037A/lat/-22.9083/lon/-43.1964/alt/0/minEl/15/] (Rio de Janeiro, without the details)
+* http://localhost:8080/api/v1/passes/98067A/lat/46.1613/lon/15.7534/alt/200/minEl/20/step/1/ (observer: Ultima
+* http://localhost:8080/api/v1/passes/98067A/lat/64.1333/lon/-21.9333/alt/61/minEl/20/step/5/ (Reykjavik, 5s step)
+* http://localhost:8080/api/v1/passes/98067A/lat/-36.8405/lon/174.7400/alt/6/minEl/30/step/0.1/ (Auckland, 30 degrees minimum elevation, 0.1 second step)
+* http://localhost:8080/api/v1/passes/98067A/lat/-22.9083/lon/-43.1964/alt/0/minEl/15/ (Rio de Janeiro, without the details)
 
