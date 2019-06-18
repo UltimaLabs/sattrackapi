@@ -18,8 +18,8 @@ import javax.validation.constraints.Size;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/v1/tles")
 @Validated
+@RequestMapping("/api/v1/tles")
 public class TleController {
 
     /**

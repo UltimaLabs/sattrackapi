@@ -1,0 +1,13 @@
+sattrack:
+
+  # Orekit data folder
+  # download the data from:
+  # https://gitlab.orekit.org/orekit/orekit-data/-/archive/master/orekit-data-master.zip
+  orekitDataFolder: /home/darko/opt/orekit-data
+
+  # cron entry for TLE data refresh, local time (not UTC)
+  tleUpdateCron: "0 47 1 * * *"
+
+  # TLE source URLs
+  tleUrls:
+    - https://download.ultimalabs.com/files/tle/amateur.txt

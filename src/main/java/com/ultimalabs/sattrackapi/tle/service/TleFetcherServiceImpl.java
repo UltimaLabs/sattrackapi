@@ -158,9 +158,11 @@ public class TleFetcherServiceImpl implements TleFetcherService {
      * @return true if string is an integer, false otherwise
      */
     private static boolean isInteger(String str) {
+
         if (str == null) {
             return false;
         }
+
         if (str.isEmpty()) {
             return false;
         }
@@ -171,6 +173,13 @@ public class TleFetcherServiceImpl implements TleFetcherService {
                 return false;
             }
         }
+
+        try {
+            Integer.parseInt(str);
+        } catch (NumberFormatException e) {
+            return false;
+        }
+
         return true;
     }
 
