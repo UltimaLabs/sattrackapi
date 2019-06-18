@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
@@ -77,7 +78,7 @@ public class PassesController {
             @Max(value = 90, message = "Elevation should not be greater than 90")
 
             @PathVariable double minEl,
-            @Min(value = 0, message = "Step size should not be less than 0.01")
+            @DecimalMin(value = "0.01", message = "Step size should not be less than 0.01")
             @PathVariable double stepSize
 
     ) {

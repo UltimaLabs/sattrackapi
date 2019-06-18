@@ -21,7 +21,7 @@ class PassesControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    private String iss = "25544";
+    private int iss = 25544;
     private double lat = 46.1613;
     private double lon = 15.7534;
     private int alt = 200;
@@ -188,7 +188,6 @@ class PassesControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
-
     @DisplayName("Pass without details invalid minimum elevation 1")
     @Test
     public void passWithoutDetailsInvalidMinEl1() throws Exception {
@@ -201,6 +200,86 @@ class PassesControllerTest {
     @Test
     public void passWithoutDetailsInvalidMinEl2() throws Exception {
         this.mockMvc.perform(get("/api/v1/passes/{iss}/lat/{lat}/lon/{lon}/alt/{alt}/minEl/{minEl}/", iss, lat, lon, alt, 100)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @DisplayName("Pass with details invalid lat 1")
+    @Test
+    public void passWithDetailsInvalidLat1() throws Exception {
+        this.mockMvc.perform(get("/api/v1/passes/{iss}/lat/{lat}/lon/{lon}/alt/{alt}/minEl/{minEl}/step/{step}/", iss, -120.99, lon, alt, minEl, step)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @DisplayName("Pass with details invalid lat 2")
+    @Test
+    public void passWithDetailsInvalidLat2() throws Exception {
+        this.mockMvc.perform(get("/api/v1/passes/{iss}/lat/{lat}/lon/{lon}/alt/{alt}/minEl/{minEl}/step/{step}/", iss, 120.9999, lon, alt, minEl, step)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @DisplayName("Pass with details invalid lon 1")
+    @Test
+    public void passWithDetailsInvalidLon1() throws Exception {
+        this.mockMvc.perform(get("/api/v1/passes/{iss}/lat/{lat}/lon/{lon}/alt/{alt}/minEl/{minEl}/step/{step}/", iss, lat, -120, alt, minEl, step)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @DisplayName("Pass with details invalid lon 2")
+    @Test
+    public void passWithDetailsInvalidLon2() throws Exception {
+        this.mockMvc.perform(get("/api/v1/passes/{iss}/lat/{lat}/lon/{lon}/alt/{alt}/minEl/{minEl}/step/{step}/", iss, lat, 120, alt, minEl, step)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @DisplayName("Pass with details invalid altitude 1")
+    @Test
+    public void passWithDetailsInvalidAlt1() throws Exception {
+        this.mockMvc.perform(get("/api/v1/passes/{iss}/lat/{lat}/lon/{lon}/alt/{alt}/minEl/{minEl}/step/{step}/", iss, lat, lon, -5, minEl, step)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @DisplayName("Pass with details invalid altitude 2")
+    @Test
+    public void passWithDetailsInvalidAlt2() throws Exception {
+        this.mockMvc.perform(get("/api/v1/passes/{iss}/lat/{lat}/lon/{lon}/alt/{alt}/minEl/{minEl}/step/{step}/", iss, lat, lon, "999999999999999", minEl, step)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @DisplayName("Pass with details invalid minimum elevation 1")
+    @Test
+    public void passWithDetailsInvalidMinEl1() throws Exception {
+        this.mockMvc.perform(get("/api/v1/passes/{iss}/lat/{lat}/lon/{lon}/alt/{alt}/minEl/{minEl}/step/{step}/", iss, lat, lon, alt, -1.5, step)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @DisplayName("Pass with details invalid minimum elevation 2")
+    @Test
+    public void passWithDetailsInvalidMinEl2() throws Exception {
+        this.mockMvc.perform(get("/api/v1/passes/{iss}/lat/{lat}/lon/{lon}/alt/{alt}/minEl/{minEl}/step/{step}/", iss, lat, lon, alt, 100, step)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @DisplayName("Pass with details negative step")
+    @Test
+    public void passWithDetailsInvalidStep1() throws Exception {
+        this.mockMvc.perform(get("/api/v1/passes/{iss}/lat/{lat}/lon/{lon}/alt/{alt}/minEl/{minEl}/step/{step}/", iss, lat, lon, alt, minEl, -1)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @DisplayName("Pass with details step too small")
+    @Test
+    public void passWithDetailsInvalidStep2() throws Exception {
+        this.mockMvc.perform(get("/api/v1/passes/{iss}/lat/{lat}/lon/{lon}/alt/{alt}/minEl/{minEl}/step/{step}/", iss, lat, lon, alt, minEl, 0.001)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
