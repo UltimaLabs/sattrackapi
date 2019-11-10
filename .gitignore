@@ -3,6 +3,7 @@
 /bin/
 !gradle/wrapper/gradle-wrapper.jar
 provisioning/roles/deploy-app/files/*.jar
+provisioning/*.retry
 
 ### STS ###
 .apt_generated
