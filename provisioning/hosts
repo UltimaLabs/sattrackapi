@@ -1,0 +1,3 @@
+[production]
+sta-prod ansible_ssh_host=10.8.18.1 ansible_ssh_port=22 ansible_ssh_user=ansible
+

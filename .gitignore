@@ -2,6 +2,7 @@
 /build/
 /bin/
 !gradle/wrapper/gradle-wrapper.jar
+provisioning/roles/deploy-app/files/*.jar
 
 ### STS ###
 .apt_generated

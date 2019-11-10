@@ -1,0 +1,9 @@
+---
+# handlers file for deploy-app
+
+- name: Reload systemd unit files
+  command: /bin/systemctl daemon-reload
+
+- name: Restart sattrackapi service
+  service: name=sattrackapi state=restarted
+

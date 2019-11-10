@@ -1,0 +1,60 @@
+---
+# tasks file for deploy-app
+
+- name: Create the app folder
+  file: path={{ app_basedir }} owner={{ app_files_owner }} group={{ app_files_group }} mode=0775 state=directory
+
+- name: Create the Orekit data folder
+  file: path={{ orekit_data_folder }} owner={{ app_files_owner }} group={{ app_files_group }} mode=0775 state=directory
+
+- name: Download and unzip the Orekit data files
+  unarchive:
+    src: "{{ orekit_data_url }}"
+    dest: "{{ orekit_data_folder }}"
+    remote_src: yes
+    owner: "{{ app_files_owner }}"
+    group: "{{ app_files_group }}"
+
+- name: Copy the app JAR
+  copy:
+    src: "{{ app_jar_file }}"
+    dest: "{{ app_basedir }}/{{ app_jar_file }}"
+    owner: "{{ app_files_owner }}"
+    group: "{{ app_files_group }}"
+  notify:
+    - Restart sattrackapi service
+
+- name: Create the current version symlink
+  file:
+    src: "{{ app_basedir }}/{{ app_jar_file }}"
+    dest: "{{ app_basedir }}/{{ app_current_jar_symlink }}"
+    owner: "{{ app_files_owner }}"
+    group: "{{ app_files_group }}"
+    state: link
+  notify:
+    - Restart sattrackapi service
+
+- name: Delete old JARs
+  script: delete_old_jars.sh {{ app_basedir }} {{ num_old_jars_to_keep }}
+
+- name: Copy application.yml file
+  template:
+    src: "{{ app_properties_src }}"
+    dest: "{{ app_basedir }}/application.yml"
+    owner: "{{ app_files_owner }}"
+    group: "{{ app_files_group }}"
+  notify:
+    - Restart sattrackapi service
+
+- name: Copy the systemd service unit
+  template:
+    src: sattrackapi.service.j2
+    dest: /etc/systemd/system/sattrackapi.service
+    owner: root
+    group: root
+  notify:
+    - Reload systemd unit files
+    - Restart sattrackapi service
+
+- name: sattrackapi service must be started and enabled on boot
+  service: name=sattrackapi state=started enabled=yes

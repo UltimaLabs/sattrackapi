@@ -14,6 +14,18 @@ repositories {
 	mavenCentral()
 }
 
+task cleanDeployDir(type: Delete) {
+    delete fileTree('provisioning/roles/deploy-app/files') {
+        include '**/*.jar'
+    }
+}
+
+task buildDeployJar(type: Copy) {
+    from jar
+    into "provisioning/roles/deploy-app/files"
+}
+
+
 configurations {
 	developmentOnly
 	runtimeClasspath {
@@ -38,3 +50,6 @@ dependencies {
 test {
 	useJUnitPlatform()
 }
+
+buildDeployJar.dependsOn cleanDeployDir, build
+

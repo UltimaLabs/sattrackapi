@@ -1,0 +1,13 @@
+#!/usr/bin/env ansible-playbook
+---
+- name: SatTrackAPI - production deploy
+  hosts: production
+  become: True
+  become_user: root
+  become_method: sudo
+
+  vars_files:
+    - vars/production.yml
+
+  roles:
+    - { role: deploy-app }

@@ -1,0 +1,14 @@
+[Unit]
+Description={{ systemd_unit_description }}
+After={{ systemd_unit_after }}
+
+[Service]
+Type={{ systemd_service_type }}
+User={{ systemd_service_user }}
+Group={{ systemd_service_group }}
+WorkingDirectory={{ app_basedir }}
+ExecStart={{ systemd_service_exec_start }}
+Restart={{ systemd_service_restart }}
+
+[Install]
+WantedBy={{ systemd_install_wanted_by }}

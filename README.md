@@ -123,7 +123,7 @@ There are a couple of important implementation details:
 
 Several request examples:
 
-* http://localhost:8080/api/v1/passes/98067A/lat/46.1613/lon/15.7534/alt/200/minEl/20/step/1/ (observer: Ultima
+* http://localhost:8080/api/v1/passes/98067A/lat/46.1613/lon/15.7534/alt/200/minEl/20/step/1/ (observer: Ultima)
 * http://localhost:8080/api/v1/passes/98067A/lat/64.1333/lon/-21.9333/alt/61/minEl/20/step/5/ (Reykjavik, 5s step)
 * http://localhost:8080/api/v1/passes/98067A/lat/-36.8405/lon/174.7400/alt/6/minEl/30/step/0.1/ (Auckland, 30 degrees minimum elevation, 0.1 second step)
 * http://localhost:8080/api/v1/passes/98067A/lat/-22.9083/lon/-43.1964/alt/0/minEl/15/ (Rio de Janeiro, without the details)

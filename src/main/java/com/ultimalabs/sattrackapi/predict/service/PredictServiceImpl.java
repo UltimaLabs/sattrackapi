@@ -84,7 +84,7 @@ public class PredictServiceImpl implements PredictService {
      * @param alt      observer altitude
      * @param minEl    minimum elevation for visibility event
      * @param stepSize resolution for pass event details, in seconds;
-     *                 if zero is passed as parameter, no details are returneds
+     *                 if zero is passed as parameter, no details are returned
      * @return pass event data
      */
     private PassEventData getEventData(TLEPlus tle, double lat, double lon, double alt, double minEl, double stepSize) {

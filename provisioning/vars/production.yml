@@ -1,0 +1,25 @@
+---
+app_basedir: /opt/ultima/sattrackapi
+app_files_owner: ultima
+app_files_group: ultima
+
+orekit_data_url: https://gitlab.orekit.org/orekit/orekit-data/-/archive/master/orekit-data-master.zip
+orekit_data_folder: /opt/ultima/sattrackapi/orekit-data
+orekit_data_folder_unzipped: /opt/ultima/sattrackapi/orekit-data/orekit-data-master
+
+num_old_jars_to_keep: 5
+
+app_current_jar_symlink: sattrackapi-current.jar
+app_properties_src: application-production.yml.j2
+
+systemd_unit_description: SatTrackAPI
+systemd_unit_after: network.target
+
+systemd_service_type: simple
+systemd_service_user: nobody
+systemd_service_group: nobody
+systemd_service_exec_start: /bin/java -Xms128m -Xmx256m -jar /opt/ultima/sattrackapi/sattrackapi-current.jar
+systemd_service_restart: always
+
+systemd_install_wanted_by: multi-user.target
+
