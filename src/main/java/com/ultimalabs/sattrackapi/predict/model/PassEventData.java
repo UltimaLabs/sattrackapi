@@ -26,6 +26,11 @@ public class PassEventData {
     private final String rise;
 
     /**
+     * Pass midpoint
+     */
+    private final PassEventDetailsEntry midpoint;
+
+    /**
      * Satellite set time
      */
     private final String set;

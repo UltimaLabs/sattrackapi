@@ -4,26 +4,29 @@ import com.ultimalabs.sattrackapi.common.model.EarthParams;
 import com.ultimalabs.sattrackapi.common.util.DoubleRound;
 import com.ultimalabs.sattrackapi.predict.model.PassEventData;
 import com.ultimalabs.sattrackapi.predict.model.PassEventDetailsEntry;
+import com.ultimalabs.sattrackapi.predict.util.PredictUtil;
 import com.ultimalabs.sattrackapi.tle.model.TLEPlus;
 import com.ultimalabs.sattrackapi.tle.service.TleFetcherService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hipparchus.geometry.euclidean.threed.Vector3D;
 import org.hipparchus.util.FastMath;
 import org.orekit.bodies.BodyShape;
 import org.orekit.bodies.GeodeticPoint;
 import org.orekit.bodies.OneAxisEllipsoid;
 import org.orekit.frames.TopocentricFrame;
-import org.orekit.frames.Transform;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.propagation.analytical.tle.TLEPropagator;
 import org.orekit.propagation.events.ElevationDetector;
+import org.orekit.propagation.events.ElevationExtremumDetector;
+import org.orekit.propagation.events.EventEnablingPredicateFilter;
+import org.orekit.propagation.events.EventsLogger;
+import org.orekit.propagation.events.EventsLogger.LoggedEvent;
+import org.orekit.propagation.events.handlers.ContinueOnEvent;
 import org.orekit.propagation.events.handlers.EventHandler;
 import org.orekit.propagation.sampling.OrekitFixedStepHandler;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.TimeScalesFactory;
-import org.orekit.utils.PVCoordinates;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -44,6 +47,16 @@ public class PredictServiceImpl implements PredictService {
      */
     private final TleFetcherService tleFetcherService;
 
+    /**
+     * Returns next visibility event without pass details
+     *
+     * @param searchString Satellite Number or International Designator
+     * @param longitude    observer longitude
+     * @param latitude     observer latitude
+     * @param altitude     observer altitude
+     * @param minElevation minimal elevation
+     * @return next visibility event, without the details
+     */
     @Override
     public PassEventData getNextEventWithoutDetails(String searchString, double latitude, double longitude, double altitude, double minElevation) {
         return getEventData(getTle(searchString), latitude, longitude, altitude, minElevation, 0.);
@@ -91,6 +104,7 @@ public class PredictServiceImpl implements PredictService {
 
         AbsoluteDate now = new AbsoluteDate(new Date(), TimeScalesFactory.getUTC());
         TLEPropagator propagator = TLEPropagator.selectExtrapolator(tle);
+        EventsLogger logger = new EventsLogger();
         propagator.propagate(now);
 
         final BodyShape earth = new OneAxisEllipsoid(EarthParams.EQUATORIAL_RADIUS, EarthParams.FLATTENING, EarthParams.iers2010Frame);
@@ -99,36 +113,49 @@ public class PredictServiceImpl implements PredictService {
         final TopocentricFrame observerFrame = new TopocentricFrame(earth, observer, "observer");
 
         // Event definition
-        final double maxcheck = 100.0;
+        final double maxCheck = 100.0;
         final double threshold = 0.001;
         final double elevation = FastMath.toRadians(minEl);
+
         final ElevationDetector visibilityDetector =
-                new ElevationDetector(maxcheck, threshold, observerFrame).
+                new ElevationDetector(maxCheck, threshold, observerFrame).
                         withConstantElevation(elevation).
                         withHandler(new VisibilityHandler());
 
-        propagator.addEventDetector(visibilityDetector);
-        VisibilityHandler visibilityHandler = (VisibilityHandler) visibilityDetector.getHandler();
+        final ElevationExtremumDetector raw =
+                new ElevationExtremumDetector(maxCheck, threshold, observerFrame).
+                        withHandler(new ContinueOnEvent<>());
 
-        // Propagate from now to the first raising or for the fixed duration of 48 hours
-        propagator.propagate(now.shiftedBy(172800.));
+        final EventEnablingPredicateFilter<ElevationExtremumDetector> aboveGroundElevationDetector =
+                new EventEnablingPredicateFilter<>(raw,
+                        (state, eventDetector, g) -> eventDetector.getElevation(state) > elevation).withMaxCheck(maxCheck);
 
-        if (visibilityHandler.getRise() == null) {
+        propagator.addEventDetector(logger.monitorDetector(aboveGroundElevationDetector));
+        propagator.addEventDetector(logger.monitorDetector(visibilityDetector));
+
+        // Propagate from now to the first raising or for the fixed duration of 72 hours
+        propagator.propagate(now.shiftedBy(259200.));
+
+        // if all went well, we have a list with three events:
+        // 0 - rise
+        // 1 - midpoint
+        // 2 - set
+        if (logger.getLoggedEvents().size() != 3) {
             return null;
         }
 
-        if (visibilityHandler.getSet() == null) {
-            return null;
-        }
+        List<LoggedEvent> loggedEvents = logger.getLoggedEvents();
 
-        AbsoluteDate riseDate = visibilityHandler.getRise();
-        AbsoluteDate setDate = visibilityHandler.getSet();
+        AbsoluteDate riseDate = loggedEvents.get(0).getState().getDate();
+        PassEventDetailsEntry midpoint = PredictUtil.getEventDetails(loggedEvents.get(1).getState(), observerFrame);
+        AbsoluteDate setDate = loggedEvents.get(2).getState().getDate();
 
         if (stepSize == 0.) {
             return new PassEventData(
                     now.getDate().toString(),
                     DoubleRound.round(riseDate.offsetFrom(now, TimeScalesFactory.getUTC()), 2),
                     riseDate.toString(),
+                    midpoint,
                     setDate.toString(),
                     DoubleRound.round(setDate.offsetFrom(riseDate, TimeScalesFactory.getUTC()), 2),
                     Collections.emptyList()
@@ -145,6 +172,7 @@ public class PredictServiceImpl implements PredictService {
                 now.getDate().toString(),
                 DoubleRound.round(riseDate.offsetFrom(now, TimeScalesFactory.getUTC()), 2),
                 riseDate.toString(),
+                midpoint,
                 setDate.toString(),
                 DoubleRound.round(setDate.offsetFrom(riseDate, TimeScalesFactory.getUTC()), 2),
                 stepHandler.getPassDetails()
@@ -159,16 +187,6 @@ public class PredictServiceImpl implements PredictService {
     private static class VisibilityHandler implements EventHandler<ElevationDetector> {
 
         /**
-         * Satellite rise time
-         */
-        private AbsoluteDate rise;
-
-        /**
-         * Satellite set time
-         */
-        private AbsoluteDate set;
-
-        /**
          * Handle the event
          *
          * @param s          SpaceCraft state to be used in the evaluation
@@ -179,12 +197,11 @@ public class PredictServiceImpl implements PredictService {
         public Action eventOccurred(final SpacecraftState s, final ElevationDetector detector,
                                     final boolean increasing) {
             if (increasing) {
-                this.rise = s.getDate();
                 return Action.CONTINUE;
-            } else {
-                this.set = s.getDate();
-                return Action.STOP;
             }
+
+            return Action.STOP;
+
         }
     }
 
@@ -209,34 +226,7 @@ public class PredictServiceImpl implements PredictService {
          */
         public void handleStep(SpacecraftState currentState, boolean isLast) {
 
-            // get transform between state reference frame
-            // and observer at current time
-            Transform transform = currentState.getFrame().getTransformTo(observerFrame,
-                    currentState.getDate());
-
-            // get position-velocity in ground station frame
-            PVCoordinates pv = transform.transformPVCoordinates(currentState.getPVCoordinates());
-            Vector3D position = pv.getPosition();
-            Vector3D velocity = pv.getVelocity();
-
-            // extract pointing data
-            double azimuth = FastMath.toDegrees(position.getAlpha() * -1.) + 90;
-
-            if (azimuth < 0.) {
-                azimuth += 360.;
-            }
-
-            double elevation = FastMath.toDegrees(position.getDelta());
-            double distance = currentState.getPVCoordinates(observerFrame).getPosition().getNorm();
-            double doppler = position.normalize().dotProduct(velocity);
-
-            passDetails.add(new PassEventDetailsEntry(
-                    currentState.getDate().toString(),
-                    DoubleRound.round(azimuth, 2),
-                    DoubleRound.round(elevation, 2),
-                    DoubleRound.round(distance, 0),
-                    DoubleRound.round(doppler, 0)
-            ));
+            passDetails.add(PredictUtil.getEventDetails(currentState, observerFrame));
 
         }
 
