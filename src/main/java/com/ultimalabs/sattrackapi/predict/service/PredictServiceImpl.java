@@ -2,8 +2,8 @@ package com.ultimalabs.sattrackapi.predict.service;
 
 import com.ultimalabs.sattrackapi.common.model.EarthParams;
 import com.ultimalabs.sattrackapi.common.util.DoubleRound;
-import com.ultimalabs.sattrackapi.predict.model.PassEventData;
-import com.ultimalabs.sattrackapi.predict.model.PassEventDetailsEntry;
+import com.ultimalabs.sattrackapi.predict.model.PassEventDataPoint;
+import com.ultimalabs.sattrackapi.predict.model.SatellitePass;
 import com.ultimalabs.sattrackapi.predict.util.PredictUtil;
 import com.ultimalabs.sattrackapi.tle.model.TLEPlus;
 import com.ultimalabs.sattrackapi.tle.service.TleFetcherService;
@@ -58,7 +58,7 @@ public class PredictServiceImpl implements PredictService {
      * @return next visibility event, without the details
      */
     @Override
-    public PassEventData getNextEventWithoutDetails(String searchString, double latitude, double longitude, double altitude, double minElevation) {
+    public SatellitePass getNextEventWithoutDetails(String searchString, double latitude, double longitude, double altitude, double minElevation) {
         return getEventData(getTle(searchString), latitude, longitude, altitude, minElevation, 0.);
     }
 
@@ -74,7 +74,7 @@ public class PredictServiceImpl implements PredictService {
      * @return next visibility event, with details
      */
     @Override
-    public PassEventData getNextEventWithDetails(String searchString, double latitude, double longitude, double altitude, double minElevation, double stepSize) {
+    public SatellitePass getNextEventWithDetails(String searchString, double latitude, double longitude, double altitude, double minElevation, double stepSize) {
         return getEventData(getTle(searchString), latitude, longitude, altitude, minElevation, stepSize);
     }
 
@@ -100,7 +100,7 @@ public class PredictServiceImpl implements PredictService {
      *                 if zero is passed as parameter, no details are returned
      * @return pass event data
      */
-    private PassEventData getEventData(TLEPlus tle, double lat, double lon, double alt, double minEl, double stepSize) {
+    private SatellitePass getEventData(TLEPlus tle, double lat, double lon, double alt, double minEl, double stepSize) {
 
         AbsoluteDate now = new AbsoluteDate(new Date(), TimeScalesFactory.getUTC());
         TLEPropagator propagator = TLEPropagator.selectExtrapolator(tle);
@@ -113,8 +113,8 @@ public class PredictServiceImpl implements PredictService {
         final TopocentricFrame observerFrame = new TopocentricFrame(earth, observer, "observer");
 
         // Event definition
-        final double maxCheck = 100.0;
-        final double threshold = 0.001;
+        final double maxCheck = 60.0;
+        final double threshold = 10e-6;
         final double elevation = FastMath.toRadians(minEl);
 
         final ElevationDetector visibilityDetector =
@@ -146,18 +146,21 @@ public class PredictServiceImpl implements PredictService {
 
         List<LoggedEvent> loggedEvents = logger.getLoggedEvents();
 
+        LoggedEvent riseEvent = loggedEvents.get(0);
+        LoggedEvent midPointEvent = loggedEvents.get(1);
+        LoggedEvent setEvent = loggedEvents.get(2);
+
         AbsoluteDate riseDate = loggedEvents.get(0).getState().getDate();
-        PassEventDetailsEntry midpoint = PredictUtil.getEventDetails(loggedEvents.get(1).getState(), observerFrame);
         AbsoluteDate setDate = loggedEvents.get(2).getState().getDate();
 
         if (stepSize == 0.) {
-            return new PassEventData(
+            return new SatellitePass(
                     tle.getTle(),
                     now.getDate().toString(),
                     DoubleRound.round(riseDate.offsetFrom(now, TimeScalesFactory.getUTC()), 2),
-                    riseDate.toString(),
-                    midpoint,
-                    setDate.toString(),
+                    PredictUtil.getEventDetails(riseEvent.getState(), observerFrame),
+                    PredictUtil.getEventDetails(midPointEvent.getState(), observerFrame),
+                    PredictUtil.getEventDetails(setEvent.getState(), observerFrame),
                     DoubleRound.round(setDate.offsetFrom(riseDate, TimeScalesFactory.getUTC()), 2),
                     Collections.emptyList()
             );
@@ -169,13 +172,13 @@ public class PredictServiceImpl implements PredictService {
         masterModePropagator.setMasterMode(stepSize, stepHandler);
         masterModePropagator.propagate(setDate);
 
-        return new PassEventData(
+        return new SatellitePass(
                 tle.getTle(),
                 now.getDate().toString(),
                 DoubleRound.round(riseDate.offsetFrom(now, TimeScalesFactory.getUTC()), 2),
-                riseDate.toString(),
-                midpoint,
-                setDate.toString(),
+                PredictUtil.getEventDetails(riseEvent.getState(), observerFrame),
+                PredictUtil.getEventDetails(midPointEvent.getState(), observerFrame),
+                PredictUtil.getEventDetails(setEvent.getState(), observerFrame),
                 DoubleRound.round(setDate.offsetFrom(riseDate, TimeScalesFactory.getUTC()), 2),
                 stepHandler.getPassDetails()
         );
@@ -218,7 +221,7 @@ public class PredictServiceImpl implements PredictService {
 
         private final TopocentricFrame observerFrame;
 
-        private List<PassEventDetailsEntry> passDetails = new ArrayList<>();
+        private List<PassEventDataPoint> passDetails = new ArrayList<>();
 
         /**
          * Handle the current step

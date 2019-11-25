@@ -1,6 +1,6 @@
 package com.ultimalabs.sattrackapi.predict.controller;
 
-import com.ultimalabs.sattrackapi.predict.model.PassEventData;
+import com.ultimalabs.sattrackapi.predict.model.SatellitePass;
 import com.ultimalabs.sattrackapi.predict.service.PredictService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +31,7 @@ public class PassesController {
     private final PredictService predictService;
 
     @GetMapping("/{searchString}/lat/{lat}/lon/{lon}/alt/{alt}/minEl/{minEl}")
-    public PassEventData passWithoutDetails(
+    public SatellitePass passWithoutDetails(
 
             @Size(min = 5, max = 11, message = "Satellite identifier must be between 5 and 11 characters long")
             @PathVariable String searchString,
@@ -57,7 +57,7 @@ public class PassesController {
     }
 
     @GetMapping("/{searchString}/lat/{lat}/lon/{lon}/alt/{alt}/minEl/{minEl}/step/{stepSize}")
-    public PassEventData passWithDetails(
+    public SatellitePass passWithDetails(
 
             @Size(min = 5, max = 11, message = "Satellite identifier must be between 5 and 11 characters long")
             @PathVariable String searchString,

@@ -1,7 +1,7 @@
 package com.ultimalabs.sattrackapi.predict.util;
 
 import com.ultimalabs.sattrackapi.common.util.DoubleRound;
-import com.ultimalabs.sattrackapi.predict.model.PassEventDetailsEntry;
+import com.ultimalabs.sattrackapi.predict.model.PassEventDataPoint;
 import org.hipparchus.geometry.euclidean.threed.Vector3D;
 import org.hipparchus.util.FastMath;
 import org.orekit.frames.TopocentricFrame;
@@ -25,7 +25,7 @@ public class PredictUtil {
      * @param observerFrame observer frame
      * @return pass event details
      */
-    public static PassEventDetailsEntry getEventDetails(SpacecraftState s, TopocentricFrame observerFrame) {
+    public static PassEventDataPoint getEventDetails(SpacecraftState s, TopocentricFrame observerFrame) {
 
         // get transform between state reference frame
         // and observer at current time
@@ -48,7 +48,7 @@ public class PredictUtil {
         double distance = s.getPVCoordinates(observerFrame).getPosition().getNorm();
         double doppler = position.normalize().dotProduct(velocity);
 
-        return new PassEventDetailsEntry(
+        return new PassEventDataPoint(
                 s.getDate().toString(),
                 DoubleRound.round(azimuth, 2),
                 DoubleRound.round(elevation, 2),
