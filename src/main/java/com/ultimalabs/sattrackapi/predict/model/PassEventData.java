@@ -11,6 +11,11 @@ import java.util.List;
 public class PassEventData {
 
     /**
+     * TLE used for propagation
+     */
+    private final String tle;
+
+    /**
      * Current date and time
      */
     private final String now;

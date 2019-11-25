@@ -152,6 +152,7 @@ public class PredictServiceImpl implements PredictService {
 
         if (stepSize == 0.) {
             return new PassEventData(
+                    tle.getTle(),
                     now.getDate().toString(),
                     DoubleRound.round(riseDate.offsetFrom(now, TimeScalesFactory.getUTC()), 2),
                     riseDate.toString(),
@@ -169,6 +170,7 @@ public class PredictServiceImpl implements PredictService {
         masterModePropagator.propagate(setDate);
 
         return new PassEventData(
+                tle.getTle(),
                 now.getDate().toString(),
                 DoubleRound.round(riseDate.offsetFrom(now, TimeScalesFactory.getUTC()), 2),
                 riseDate.toString(),
