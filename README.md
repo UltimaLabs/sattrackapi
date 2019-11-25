@@ -103,9 +103,11 @@ The request parameters are:
 * `step` - step size for the event details data; when omitted, no details are returned (seconds)
 
 The pass data includes:
+* `tle` - TLE used for prediction
 * `now` - the current time
 * `wait` - a number of seconds between `now` and satellite `rise`
 * `rise` - time when the satellite rises above the `minEl`
+* `midpoint` - pass midpoint, as an event details data point (see below)
 * `set` - time when the satellite sets below the `minEl`
 * `duration` - event duration
 * `eventDetails` - event details (if requested), see below
