@@ -80,6 +80,11 @@ public class TLEPlus extends TLE {
                 this.getLaunchPiece();
     }
 
+    /**
+     * Returns a list of three TLE text lines
+     *
+     * @return TLE lines
+     */
     public String getTle() {
         if (!getName().equals("")) {
             return ourPadding("name", getName(), ' ', 24, false) +

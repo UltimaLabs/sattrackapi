@@ -8,7 +8,12 @@ import java.util.List;
  * Event data for a satellite pass
  */
 @Data
-public class PassEventData {
+public class SatellitePass {
+
+    /**
+     * TLE used for propagation
+     */
+    private final String tle;
 
     /**
      * Current date and time
@@ -21,14 +26,19 @@ public class PassEventData {
     private final Double wait;
 
     /**
-     * Satellite rise time
+     * Satellite rise time data point
      */
-    private final String rise;
+    private final PassEventDataPoint risePoint;
 
     /**
-     * Satellite set time
+     * Pass midpoint
      */
-    private final String set;
+    private final PassEventDataPoint midPoint;
+
+    /**
+     * Satellite set time data point
+     */
+    private final PassEventDataPoint setPoint;
 
     /**
      * Pass duration, in seconds
@@ -38,6 +48,6 @@ public class PassEventData {
     /**
      * Pass event entries
      */
-    private final List<PassEventDetailsEntry> eventDetails;
+    private final List<PassEventDataPoint> eventDetails;
 
 }

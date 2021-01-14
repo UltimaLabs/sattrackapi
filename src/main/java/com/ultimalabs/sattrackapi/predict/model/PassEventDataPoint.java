@@ -6,7 +6,7 @@ import lombok.Data;
  * Satellite pass details
  */
 @Data
-public class PassEventDetailsEntry {
+public class PassEventDataPoint {
 
     /**
      * Date and time for this data item
