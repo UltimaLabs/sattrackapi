@@ -1,7 +1,8 @@
 plugins {
-	id 'org.springframework.boot' version '2.1.3.RELEASE'
-	id "fr.brouillard.oss.gradle.jgitver" version "0.9.1"
+	id 'org.springframework.boot' version '2.5.5'
+	id 'fr.brouillard.oss.gradle.jgitver' version '0.9.1'
 	id 'java'
+	id "io.freefair.lombok" version "6.2.0"
 }
 
 apply plugin: 'java'
@@ -21,10 +22,13 @@ task cleanDeployDir(type: Delete) {
 }
 
 task buildDeployJar(type: Copy) {
-    from jar
-    into "provisioning/roles/deploy-app/files"
+    from bootJar
+    into 'provisioning/roles/deploy-app/files'
 }
 
+jar {
+	enabled = false
+}
 
 configurations {
 	developmentOnly
@@ -35,16 +39,12 @@ configurations {
 
 dependencies {
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	implementation('org.springframework.boot:spring-boot-starter-actuator')
-	implementation('org.springframework.boot:spring-boot-starter-web')
-	compileOnly 'org.projectlombok:lombok:1.18.6'
-	annotationProcessor 'org.projectlombok:lombok:1.18.6'	
-	compile 'org.orekit:orekit:9.3.1'
-	compile 'commons-validator:commons-validator:1.6'
-	testCompile "org.junit.jupiter:junit-jupiter-api:5.2.0"
-	testCompile "org.junit.jupiter:junit-jupiter-params:5.2.0"
-	testRuntime "org.junit.jupiter:junit-jupiter-engine:5.2.0"
-	testImplementation('org.springframework.boot:spring-boot-starter-test')
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.orekit:orekit:10.3.1'
+	implementation 'commons-validator:commons-validator:1.7'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 test {
