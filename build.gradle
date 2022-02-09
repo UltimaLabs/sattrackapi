@@ -3,6 +3,7 @@ plugins {
 	id 'fr.brouillard.oss.gradle.jgitver' version '0.9.1'
 	id 'java'
 	id "io.freefair.lombok" version "6.2.0"
+	id 'jacoco'
 }
 
 apply plugin: 'java'
@@ -51,6 +52,8 @@ dependencies {
 test {
 	useJUnitPlatform()
 }
+
+test.finalizedBy jacocoTestReport
 
 buildDeployJar.dependsOn cleanDeployDir, build
 

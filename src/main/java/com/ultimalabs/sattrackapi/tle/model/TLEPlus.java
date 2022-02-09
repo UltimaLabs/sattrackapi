@@ -17,7 +17,7 @@ public class TLEPlus extends TLE {
     /**
      * Satellite name
      */
-    private String name;
+    private final String name;
 
     public TLEPlus(String name, String line1, String line2) {
         super(line1, line2);
