@@ -1,6 +1,7 @@
 package com.ultimalabs.sattrackapi.predict.service;
 
 import com.ultimalabs.sattrackapi.predict.model.SatellitePass;
+import com.ultimalabs.sattrackapi.predict.predicter.LoggedEventsException;
 import com.ultimalabs.sattrackapi.predict.predicter.Predicter;
 import com.ultimalabs.sattrackapi.tle.model.TLEPlus;
 import com.ultimalabs.sattrackapi.tle.service.TleFetcherService;
@@ -38,7 +39,7 @@ public class PredictServiceImpl implements PredictService {
         try {
             Predicter predicter = new Predicter(getTle(searchString), latitude, longitude, altitude, minElevation);
             return predicter.getEventData();
-        } catch (Exception e) {
+        } catch (LoggedEventsException e) {
             log.error(e.getMessage(), e);
             return null;
         }
@@ -60,7 +61,7 @@ public class PredictServiceImpl implements PredictService {
         try {
             Predicter predicter = new Predicter(getTle(searchString), latitude, longitude, altitude, minElevation);
             return predicter.getEventDataWithDetails(stepSize);
-        } catch (Exception e) {
+        } catch (LoggedEventsException e) {
             log.error(e.getMessage(), e);
             return null;
         }

@@ -56,9 +56,9 @@ public class Predicter {
     /**
      * Returns next pass data extracted fromm logged events during propagation without pass details
      * @return pass event data
-     * @throws Exception
+     * @throws LoggedEventsException Thrown when number of logged events is not valid
      */
-    public SatellitePass getEventData() throws Exception {
+    public SatellitePass getEventData() throws LoggedEventsException {
 
         // Propagate from now to the first raising or for the fixed duration of 72 hours
         propagateAndLogNextSatellitePass(now, now.shiftedBy(259200.));
@@ -78,9 +78,9 @@ public class Predicter {
     /**
      * Returns next pass data extracted fromm logged events during propagation and adds pass details
      * @return pass event data with pass details
-     * @throws Exception
+     * @throws LoggedEventsException Thrown when number of logged events is not valid
      */
-    public SatellitePass getEventDataWithDetails(double stepSize) throws Exception {
+    public SatellitePass getEventDataWithDetails(double stepSize) throws LoggedEventsException {
 
         // Propagate from now to the first raising or for the fixed duration of 72 hours
         propagateAndLogNextSatellitePass(now, now.shiftedBy(259200.));
@@ -106,7 +106,7 @@ public class Predicter {
      * Propagates, logs all the events that occurred and sets the appropriate class fields
      * @param propagateFrom - Absolute date to propagate from
      * @param propagateTo - Absolute date to propagate to
-     * @throws LoggedEventsException
+     * @throws LoggedEventsException Thrown when number of logged events is not valid
      */
     private void propagateAndLogNextSatellitePass(AbsoluteDate propagateFrom, AbsoluteDate propagateTo) throws LoggedEventsException {
 
@@ -115,7 +115,7 @@ public class Predicter {
         propagator.propagate(propagateFrom, propagateTo);
 
         // if all went well, we have a list with three events: rise, midpoint, set
-        if (logger.getLoggedEvents().size() == 4)
+        if (logger.getLoggedEvents().size() == 3)
             setLoggedEventsData();
         else
             throw new LoggedEventsException(logger.getLoggedEvents());
