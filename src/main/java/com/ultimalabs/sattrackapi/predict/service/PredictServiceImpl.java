@@ -10,6 +10,7 @@ import com.ultimalabs.sattrackapi.tle.service.TleFetcherService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hipparchus.ode.events.Action;
 import org.hipparchus.util.FastMath;
 import org.orekit.bodies.BodyShape;
 import org.orekit.bodies.GeodeticPoint;
@@ -199,6 +200,7 @@ public class PredictServiceImpl implements PredictService {
          * @param increasing with the event occurred in an "increasing" or "decreasing" slope direction
          * @return the Action that the calling detector should pass back to the evaluation system
          */
+        @Override
         public Action eventOccurred(final SpacecraftState s, final ElevationDetector detector,
                                     final boolean increasing) {
             if (increasing) {

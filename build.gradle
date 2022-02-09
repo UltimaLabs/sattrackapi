@@ -45,6 +45,7 @@ dependencies {
 	implementation 'org.orekit:orekit:10.3.1'
 	implementation 'commons-validator:commons-validator:1.7'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'junit:junit:4.13.1'
 }
 
 test {
