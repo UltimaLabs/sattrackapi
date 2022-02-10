@@ -114,10 +114,8 @@ public class Predictor {
 
         addEventDetectorsToPropagator(minElevation);
 
-        System.out.println("from: " + propagateFrom + " to: " + propagateTo);
         propagator.propagate(propagateFrom, propagateTo);
-        for(LoggedEvent event : logger.getLoggedEvents())
-            System.out.println(event.getState().getDate());
+
         // if all went well, we have a list with three events: rise, midpoint, set
         if (logger.getLoggedEvents().size() == 3)
             setLoggedEventsData();
