@@ -108,6 +108,14 @@ class PassesControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @DisplayName("Next n passes without details - OK")
+    @Test
+    void getNextNPasses() throws Exception {
+        this.mockMvc.perform(get("/api/v1/passes/n/5/1998-067A/lat/{lat}/lon/{lon}/alt/{alt}/minEl/{minEl}", lat, lon, alt, minEl)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
     @DisplayName("Pass with details - 404 Not Found 1")
     @Test
     public void getNonexistingTle1WithDetails() throws Exception {
