@@ -10,6 +10,6 @@ public interface PredictService {
 
     SatellitePass getNextEventWithoutDetails(String searchString, double longitude, double latitude, double altitude, double minElevation);
 
-    List<SatellitePass> getMultipleNextEventsWithoutDetails(Integer numberOfEvents, String searchString, double longitude, double latitude, double altitude, double minElevation);
+    List<SatellitePass> getNextEventsWithoutDetails(int n, String searchString, double longitude, double latitude, double altitude, double minElevation);
 
 }

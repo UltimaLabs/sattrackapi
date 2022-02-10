@@ -1,4 +1,4 @@
-package com.ultimalabs.sattrackapi.predict.predicter;
+package com.ultimalabs.sattrackapi.predict.predictor;
 
 import lombok.RequiredArgsConstructor;
 import org.orekit.propagation.events.EventsLogger.LoggedEvent;

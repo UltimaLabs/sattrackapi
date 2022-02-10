@@ -1,4 +1,4 @@
-package com.ultimalabs.sattrackapi.predict.predicter;
+package com.ultimalabs.sattrackapi.predict.predictor;
 
 import com.ultimalabs.sattrackapi.predict.model.PassEventDataPoint;
 import com.ultimalabs.sattrackapi.predict.util.PredictUtil;

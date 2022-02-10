@@ -1,4 +1,4 @@
-package com.ultimalabs.sattrackapi.predict.predicter;
+package com.ultimalabs.sattrackapi.predict.predictor;
 
 import org.hipparchus.ode.events.Action;
 import org.orekit.propagation.SpacecraftState;

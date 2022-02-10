@@ -1,4 +1,4 @@
-package com.ultimalabs.sattrackapi.predict.predicter;
+package com.ultimalabs.sattrackapi.predict.predictor;
 
 import com.ultimalabs.sattrackapi.common.model.EarthParams;
 import com.ultimalabs.sattrackapi.common.util.DoubleRound;
@@ -22,31 +22,29 @@ import org.orekit.time.AbsoluteDate;
 import org.orekit.time.TimeScalesFactory;
 
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 @Data
-public class Predicter {
+public class Predictor {
     private final TLEPlus tle;
     private final TLEPropagator propagator;
     private final EventsLogger logger;
     private final TopocentricFrame observerFrame;
-    private final AbsoluteDate now;
     private final double minElevation;
     private final VisibilityHandler visibilityHandler;
     private final StepHandler stepHandler;
+
     private LoggedEvent riseEvent;
     private LoggedEvent midPointEvent;
     private LoggedEvent setEvent;
     private AbsoluteDate riseDate;
     private AbsoluteDate setDate;
 
-    public Predicter(TLEPlus tle, double observerLatitude, double observerLongitude, double observerAltitude, double minElevation) {
+    public Predictor(TLEPlus tle, double observerLatitude, double observerLongitude, double observerAltitude, double minElevation) {
         this.tle = tle;
         this.propagator = TLEPropagator.selectExtrapolator(tle);
         this.logger = new EventsLogger();
         this.observerFrame = getObserverFrame(observerLatitude, observerLongitude, observerAltitude);
-        this.now = new AbsoluteDate(new Date(), TimeScalesFactory.getUTC());
         this.minElevation = minElevation;
 
         this.visibilityHandler = new VisibilityHandler();
@@ -58,15 +56,15 @@ public class Predicter {
      * @return pass event data
      * @throws LoggedEventsException Thrown when number of logged events is not valid
      */
-    public SatellitePass getEventData() throws LoggedEventsException {
+    public SatellitePass getEventData(AbsoluteDate from, AbsoluteDate to) throws LoggedEventsException {
 
         // Propagate from now to the first raising or for the fixed duration of 72 hours
-        propagateAndLogNextSatellitePass(now, now.shiftedBy(259200.));
+        propagateAndLogNextSatellitePass(from, to);
 
         return new SatellitePass(
                 tle.getTle(),
-                now.getDate().toString(),
-                DoubleRound.round(riseDate.offsetFrom(now, TimeScalesFactory.getUTC()), 2),
+                from.getDate().toString(),
+                DoubleRound.round(riseDate.offsetFrom(from, TimeScalesFactory.getUTC()), 2),
                 PredictUtil.getEventDetails(riseEvent.getState(), observerFrame),
                 PredictUtil.getEventDetails(midPointEvent.getState(), observerFrame),
                 PredictUtil.getEventDetails(setEvent.getState(), observerFrame),
@@ -76,14 +74,18 @@ public class Predicter {
     }
 
     /**
+     *
      * Returns next pass data extracted fromm logged events during propagation and adds pass details
+     * @param from - Absolute date from which to log pass events
+     * @param to - Absolute date up to which to log pass events
+     * @param stepSize - Duration of the steps in seconds after which some custom function is called during integration
      * @return pass event data with pass details
      * @throws LoggedEventsException Thrown when number of logged events is not valid
      */
-    public SatellitePass getEventDataWithDetails(double stepSize) throws LoggedEventsException {
+    public SatellitePass getEventDataWithDetails(AbsoluteDate from, AbsoluteDate to, double stepSize) throws LoggedEventsException {
 
         // Propagate from now to the first raising or for the fixed duration of 72 hours
-        propagateAndLogNextSatellitePass(now, now.shiftedBy(259200.));
+        propagateAndLogNextSatellitePass(from, to);
 
         TLEPropagator masterModePropagator = TLEPropagator.selectExtrapolator(tle);
         masterModePropagator.propagate(riseDate);
@@ -92,8 +94,8 @@ public class Predicter {
 
         return new SatellitePass(
                 tle.getTle(),
-                now.getDate().toString(),
-                DoubleRound.round(riseDate.offsetFrom(now, TimeScalesFactory.getUTC()), 2),
+                from.getDate().toString(),
+                DoubleRound.round(riseDate.offsetFrom(from, TimeScalesFactory.getUTC()), 2),
                 PredictUtil.getEventDetails(riseEvent.getState(), observerFrame),
                 PredictUtil.getEventDetails(midPointEvent.getState(), observerFrame),
                 PredictUtil.getEventDetails(setEvent.getState(), observerFrame),
@@ -112,8 +114,10 @@ public class Predicter {
 
         addEventDetectorsToPropagator(minElevation);
 
+        System.out.println("from: " + propagateFrom + " to: " + propagateTo);
         propagator.propagate(propagateFrom, propagateTo);
-
+        for(LoggedEvent event : logger.getLoggedEvents())
+            System.out.println(event.getState().getDate());
         // if all went well, we have a list with three events: rise, midpoint, set
         if (logger.getLoggedEvents().size() == 3)
             setLoggedEventsData();
@@ -122,7 +126,7 @@ public class Predicter {
     }
     
     /**
-     * Adds event detectors to the propagator
+     * Adds event detectors to the propagator and clears previously logged events from the logger
      * @param minEl - Minimal elevation from which to start event detection
      */
     private void addEventDetectorsToPropagator(double minEl) {
@@ -144,13 +148,15 @@ public class Predicter {
                 new EventEnablingPredicateFilter<>(raw,
                         (state, eventDetector, g) -> eventDetector.getElevation(state) > elevation).withMaxCheck(maxCheck);
 
+        logger.clearLoggedEvents();
+
         propagator.clearEventsDetectors();
         propagator.addEventDetector(logger.monitorDetector(aboveGroundElevationDetector));
         propagator.addEventDetector(logger.monitorDetector(visibilityDetector));
     }
 
     /**
-     * Sets all logged events data to the aproppriate class fields
+     * Sets all logged events data to the aproppriate class fields (riseEvent, riseDate, midPointEvent, setEvent, setDate)
      */
     private void setLoggedEventsData() {
         List<LoggedEvent> loggedEvents = logger.getLoggedEvents();
