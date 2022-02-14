@@ -1,6 +1,8 @@
 package com.ultimalabs.sattrackapi.predict.service;
 
 import com.ultimalabs.sattrackapi.predict.model.SatellitePass;
+import com.ultimalabs.sattrackapi.predict.model.dto.ObserverParams;
+import com.ultimalabs.sattrackapi.predict.model.dto.TLEParams;
 import com.ultimalabs.sattrackapi.tle.model.TLEPlus;
 import com.ultimalabs.sattrackapi.tle.service.TleFetcherService;
 import org.junit.jupiter.api.BeforeAll;
@@ -26,6 +28,12 @@ import static org.mockito.Mockito.when;
 class PredictServiceTest {
 
     static TLEPlus tle;
+    static TLEParams tleParamsWithSatId;
+    static TLEParams tleParamsWithTleLines;
+    static double invalidMinElevation = 1000;
+    static ObserverParams observerParams;
+    static ObserverParams observerParamsWithInvalidMinEl;
+
 
     @Mock TleFetcherService tleFetcherService;
     @InjectMocks PredictServiceImpl predictService;
@@ -42,6 +50,15 @@ class PredictServiceTest {
                 "1 25544U 98067A   08264.51782528 -.00002182  00000-0 -11606-4 0  2927",
                 "2 25544  51.6416 247.4627 0006703 130.5360 325.0288 15.72125391563537"
         );
+        tleParamsWithSatId = new TLEParams("25544");
+        tleParamsWithTleLines = new TLEParams(
+                "ISS",
+                "ISS",
+                "1 25544U 98067A   08264.51782528 -.00002182  00000-0 -11606-4 0  2927",
+                "2 25544  51.6416 247.4627 0006703 130.5360 325.0288 15.72125391563537"
+        );
+        observerParams = new ObserverParams(15.9819, 45.815, 400, 1.);
+        observerParamsWithInvalidMinEl = new ObserverParams(15.9819, 45.815, 400, invalidMinElevation);
     }
 
     @BeforeEach
@@ -52,33 +69,21 @@ class PredictServiceTest {
     @Test
     void returnNullWhenFailedEventLogging() {
 
-        double invalidMinElevation = 1000;
-
-        assertNull(predictService.getNextEventWithoutDetails(
-                "25544", 15.9819, 45.815, 400, invalidMinElevation)
-        );
-        assertNull(predictService.getNextEventWithDetails(
-                "25544", 15.9819, 45.815, 400, invalidMinElevation, 1.)
-        );
-        assertEquals(Collections.emptyList(), predictService.getNextEventsWithoutDetails(
-                10,"25544", 15.9819, 45.815, 400, invalidMinElevation)
-        );
+        assertNull(predictService.getNextEventWithoutDetails(tleParamsWithSatId, observerParamsWithInvalidMinEl));
+        assertNull(predictService.getNextEventWithDetails(tleParamsWithSatId, observerParamsWithInvalidMinEl, 1.));
+        assertEquals(Collections.emptyList(), predictService.getNextEventsWithoutDetails(10, tleParamsWithSatId, observerParamsWithInvalidMinEl));
     }
 
     @Test
     void returnEventDataWithoutDetails() {
 
-        assertNotNull(predictService.getNextEventWithoutDetails(
-                "25544", 15.9819, 45.815, 400, 1)
-        );
+        assertNotNull(predictService.getNextEventWithoutDetails(tleParamsWithSatId, observerParams));
     }
 
     @Test
     void returnEventDataWithDetails() {
 
-        assertNotNull(predictService.getNextEventWithDetails(
-                "25544", 15.9819, 45.815, 400, 1, 1.)
-        );
+        assertNotNull(predictService.getNextEventWithDetails(tleParamsWithSatId, observerParams, 1.));
     }
 
     @Test
@@ -86,8 +91,7 @@ class PredictServiceTest {
 
         int numberOfEvents = 5;
 
-        List<SatellitePass> events = predictService.getNextEventsWithoutDetails(
-                numberOfEvents,"25544", 15.9819, 45.815, 400, 1);
+        List<SatellitePass> events = predictService.getNextEventsWithoutDetails(numberOfEvents, tleParamsWithSatId, observerParams);
 
         assertNotNull(events);
         assertEquals(numberOfEvents, events.size());

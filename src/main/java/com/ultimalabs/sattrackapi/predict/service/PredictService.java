@@ -1,15 +1,17 @@
 package com.ultimalabs.sattrackapi.predict.service;
 
 import com.ultimalabs.sattrackapi.predict.model.SatellitePass;
+import com.ultimalabs.sattrackapi.predict.model.dto.ObserverParams;
+import com.ultimalabs.sattrackapi.predict.model.dto.TLEParams;
 
 import java.util.List;
 
 public interface PredictService {
 
-    SatellitePass getNextEventWithDetails(String searchString, double longitude, double latitude, double altitude, double minElevation, double stepSize);
+    SatellitePass getNextEventWithoutDetails(TLEParams tleParams, ObserverParams observerParams);
 
-    SatellitePass getNextEventWithoutDetails(String searchString, double longitude, double latitude, double altitude, double minElevation);
+    SatellitePass getNextEventWithDetails(TLEParams tleParams, ObserverParams observerParams, double stepSize);
 
-    List<SatellitePass> getNextEventsWithoutDetails(int n, String searchString, double longitude, double latitude, double altitude, double minElevation);
+    List<SatellitePass> getNextEventsWithoutDetails(int n, TLEParams tleParams, ObserverParams observerParams);
 
 }

@@ -120,7 +120,7 @@ public class Predictor {
         if (logger.getLoggedEvents().size() == 3)
             setLoggedEventsData();
         else
-            throw new LoggedEventsException(logger.getLoggedEvents());
+            throw new LoggedEventsException(logger.getLoggedEvents(), tle.getName());
     }
     
     /**

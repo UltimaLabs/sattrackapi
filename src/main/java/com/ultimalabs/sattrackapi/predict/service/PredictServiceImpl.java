@@ -1,6 +1,8 @@
 package com.ultimalabs.sattrackapi.predict.service;
 
 import com.ultimalabs.sattrackapi.predict.model.SatellitePass;
+import com.ultimalabs.sattrackapi.predict.model.dto.ObserverParams;
+import com.ultimalabs.sattrackapi.predict.model.dto.TLEParams;
 import com.ultimalabs.sattrackapi.predict.predictor.LoggedEventsException;
 import com.ultimalabs.sattrackapi.predict.predictor.Predictor;
 import com.ultimalabs.sattrackapi.tle.model.TLEPlus;
@@ -25,17 +27,21 @@ class PredictServiceImpl implements PredictService {
 
     /**
      * Returns next visibility event without pass details
-     * @param searchString Satellite Number or International Designator
-     * @param longitude    observer longitude
-     * @param latitude     observer latitude
-     * @param altitude     observer altitude
-     * @param minElevation minimal elevation
+     * @param tleParams TLE parameters object containing satellite identifier or satellite name and tle lines
+     * @param observerParams Observer parameters object containing longitude, latitude, altitude and min elevation values
      * @return next visibility event, without the details
      */
     @Override
-    public SatellitePass getNextEventWithoutDetails(String searchString, double latitude, double longitude, double altitude, double minElevation) {
+    public SatellitePass getNextEventWithoutDetails(TLEParams tleParams, ObserverParams observerParams) {
         try {
-            Predictor predictor = new Predictor(getTle(searchString), latitude, longitude, altitude, minElevation);
+            Predictor predictor = new Predictor(
+                    getTle(tleParams),
+                    observerParams.getLatitude(),
+                    observerParams.getLongitude(),
+                    observerParams.getAltitude(),
+                    observerParams.getMinElevation()
+            );
+
             AbsoluteDate now = getNowAsAbsoluteDate();
             return predictor.getEventData(now, now.shiftedBy(259200.));
         } catch (LoggedEventsException e) {
@@ -46,18 +52,21 @@ class PredictServiceImpl implements PredictService {
 
     /**
      * Returns next visibility event with pass details
-     * @param searchString Satellite Number or International Designator
-     * @param longitude    observer longitude
-     * @param latitude     observer latitude
-     * @param altitude     observer altitude
-     * @param minElevation minimal elevation
+     * @param tleParams TLE parameters object containing satellite identifier or satellite name and tle lines
+     * @param observerParams Observer parameters object containing longitude, latitude, altitude and min elevation values
      * @param stepSize     step resolution for the master mode propagator
      * @return next visibility event, with details
      */
     @Override
-    public SatellitePass getNextEventWithDetails(String searchString, double latitude, double longitude, double altitude, double minElevation, double stepSize) {
+    public SatellitePass getNextEventWithDetails(TLEParams tleParams, ObserverParams observerParams, double stepSize) {
         try {
-            Predictor predictor = new Predictor(getTle(searchString), latitude, longitude, altitude, minElevation);
+            Predictor predictor = new Predictor(
+                    getTle(tleParams),
+                    observerParams.getLatitude(),
+                    observerParams.getLongitude(),
+                    observerParams.getAltitude(),
+                    observerParams.getMinElevation()
+            );
             AbsoluteDate now = getNowAsAbsoluteDate();
             return predictor.getEventDataWithDetails(now, now.shiftedBy(259200.), stepSize);
         } catch (LoggedEventsException e) {
@@ -69,18 +78,21 @@ class PredictServiceImpl implements PredictService {
     /**
      * Returns a number of next visibility events without pass details
      * @param n            Number of visibility events to log and return
-     * @param searchString Satellite Number or International Designator
-     * @param longitude    observer longitude
-     * @param latitude     observer latitude
-     * @param altitude     observer altitude
-     * @param minElevation minimal elevation
+     * @param tleParams TLE parameters object containing satellite identifier or satellite name and tle lines
+     * @param observerParams Observer parameters object containing longitude, latitude, altitude and min elevation values
      * @return next n visibility events, without the details
      */
     @Override
-    public List<SatellitePass> getNextEventsWithoutDetails(int n, String searchString, double longitude, double latitude, double altitude, double minElevation) {
+    public List<SatellitePass> getNextEventsWithoutDetails(int n, TLEParams tleParams, ObserverParams observerParams) {
         try {
             List<SatellitePass> events = new ArrayList<>();
-            Predictor predictor = new Predictor(getTle(searchString), latitude, longitude, altitude, minElevation);
+            Predictor predictor = new Predictor(
+                    getTle(tleParams),
+                    observerParams.getLatitude(),
+                    observerParams.getLongitude(),
+                    observerParams.getAltitude(),
+                    observerParams.getMinElevation()
+            );
 
             for (int i = 0; i < n; i++) {
                 AbsoluteDate from = shiftDateForNextPass(predictor.getSetDate());
@@ -103,12 +115,15 @@ class PredictServiceImpl implements PredictService {
     }
 
     /**
-     * Returns TLE object based on search string
-     * @param searchString Satellite Number or International Designator
+     * Returns TLE object based on TLE parameters
+     * @param tleParams TLE parameters object containing satellite identifier or satellite name and tle lines
      * @return TLE object
      */
-    private TLEPlus getTle(String searchString) {
-        return tleFetcherService.getTle(searchString);
+    private TLEPlus getTle(TLEParams tleParams) {
+        if(tleParams.getLine1() == null || tleParams.getLine2() == null)
+            return tleFetcherService.getTle(tleParams.getSatelliteIdentifier());
+        else
+            return new TLEPlus(tleParams.getSatelliteName(), tleParams.getLine1(), tleParams.getLine2());
     }
 
     /**

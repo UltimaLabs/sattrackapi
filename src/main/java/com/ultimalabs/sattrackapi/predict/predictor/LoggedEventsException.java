@@ -9,9 +9,10 @@ import java.util.List;
 public class LoggedEventsException extends RuntimeException{
 
     private final List<LoggedEvent> loggedEvents;
+    private final String satelliteName;
 
     @Override
     public String getMessage() {
-        return "Error occured while logging events occurred during propagation. Number of logged events: " + loggedEvents.size();
+        return "Error occured while logging events for satellite '"+ satelliteName +"' occurred during propagation. Number of logged events: " + loggedEvents.size();
     }
 }

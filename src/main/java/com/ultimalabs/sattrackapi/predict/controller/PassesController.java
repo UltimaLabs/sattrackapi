@@ -1,7 +1,10 @@
 package com.ultimalabs.sattrackapi.predict.controller;
 
 import com.ultimalabs.sattrackapi.predict.model.SatellitePass;
+import com.ultimalabs.sattrackapi.predict.model.dto.ObserverParams;
+import com.ultimalabs.sattrackapi.predict.model.dto.TLEParams;
 import com.ultimalabs.sattrackapi.predict.service.PredictService;
+import com.ultimalabs.sattrackapi.tle.service.TleFetcherService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -10,8 +13,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.constraints.*;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Passes REST controller
@@ -28,7 +35,12 @@ public class PassesController {
      */
     private final PredictService predictService;
 
-    @GetMapping("/{searchString}/lat/{lat}/lon/{lon}/alt/{alt}/minEl/{minEl}")
+    /**
+     * TLE fetcher service
+     */
+    private final TleFetcherService tleFetcherService;
+
+    @GetMapping("/{searchString}/lat/{lat}/lon/{lon}/alt/{alt}/minEl/{minEl}/name/{name}/line1/{line1}/line2/{line2}")
     public SatellitePass passWithoutDetails(
 
             @Size(min = 5, max = 11, message = "Satellite identifier must be between 5 and 11 characters long")
@@ -48,13 +60,20 @@ public class PassesController {
 
             @Min(value = 0, message = "Elevation should not be less than 0")
             @Max(value = 90, message = "Elevation should not be greater than 90")
-            @PathVariable double minEl
+            @PathVariable double minEl,
+
+            @PathVariable(required = false) Optional<String> name,
+            @PathVariable(required = false) Optional<String> line1,
+            @PathVariable(required = false) Optional<String> line2
 
     ) {
-        return predictService.getNextEventWithoutDetails(searchString, lat, lon, alt, minEl);
+        return predictService.getNextEventWithoutDetails(
+                buildTleParams(searchString, name, line1, line2),
+                new ObserverParams(lon, lat, alt, minEl)
+        );
     }
 
-    @GetMapping("/{searchString}/lat/{lat}/lon/{lon}/alt/{alt}/minEl/{minEl}/step/{stepSize}")
+    @GetMapping("/{searchString}/lat/{lat}/lon/{lon}/alt/{alt}/minEl/{minEl}/step/{stepSize}/name/{name}/line1/{line1}/line2/{line2}")
     public SatellitePass passWithDetails(
 
             @Size(min = 5, max = 11, message = "Satellite identifier must be between 5 and 11 characters long")
@@ -77,12 +96,20 @@ public class PassesController {
 
             @PathVariable double minEl,
             @DecimalMin(value = "0.01", message = "Step size should not be less than 0.01")
-            @PathVariable double stepSize
+            @PathVariable double stepSize,
+
+            @PathVariable(required = false) Optional<String> name,
+            @PathVariable(required = false) Optional<String> line1,
+            @PathVariable(required = false) Optional<String> line2
 
     ) {
-        return predictService.getNextEventWithDetails(searchString, lat, lon, alt, minEl, stepSize);
+        return predictService.getNextEventWithDetails(
+                buildTleParams(searchString, name, line1, line2),
+                new ObserverParams(lon, lat, alt, minEl),
+                stepSize
+        );
     }
-
+/*
     @GetMapping("/n/{n}/{searchString}/lat/{lat}/lon/{lon}/alt/{alt}/minEl/{minEl}")
     public List<SatellitePass> nPassesWithoutDetails(
 
@@ -109,7 +136,54 @@ public class PassesController {
             @Max(value = 90, message = "Elevation should not be greater than 90")
             @PathVariable double minEl
     ) {
-        return predictService.getNextEventsWithoutDetails(n, searchString, lat, lon, alt, minEl);
+
+        TLEParams tleParams = new TLEParams(searchString);
+        ObserverParams observerParams = new ObserverParams(lon, lat, alt, minEl);
+        return predictService.getNextEventsWithoutDetails(n, tleParams, observerParams);
+    }*/
+
+    @GetMapping("/n/{n}/{searchString}/lat/{lat}/lon/{lon}/alt/{alt}/minEl/{minEl}/name/{name}/line1/{line1}/line2/{line2}")
+    public List<SatellitePass> nPassesWithoutDetails(
+
+            @Min(value = 1, message = "Must request at least one next satellite pass")
+            @Max(value = 20, message = "To many next satellite passes requested, max number is 20")
+            @PathVariable int n,
+
+            @Size(min = 5, max = 11, message = "Satellite identifier must be between 5 and 11 characters long")
+            @PathVariable String searchString,
+
+            @Min(value = -90, message = "Latitude should not be less than -90")
+            @Max(value = 90, message = "Latitude should not be greater than 90")
+            @PathVariable double lat,
+
+            @Min(value = -90, message = "Longitude should not be less than -90")
+            @Max(value = 90, message = "Longitude should not be greater than 90")
+            @PathVariable double lon,
+
+            @Min(value = 0, message = "Altitude should be greater or equal to zero")
+            @Max(value = Integer.MAX_VALUE, message = "Altitude value is too large")
+            @PathVariable double alt,
+
+            @Min(value = 0, message = "Elevation should not be less than 0")
+            @Max(value = 90, message = "Elevation should not be greater than 90")
+            @PathVariable double minEl,
+
+            @PathVariable(required = false) Optional<String> name,
+            @PathVariable(required = false) Optional<String> line1,
+            @PathVariable(required = false) Optional<String> line2
+    ) {
+        return predictService.getNextEventsWithoutDetails(
+                n,
+                buildTleParams(searchString, name, line1, line2),
+                new ObserverParams(lon, lat, alt, minEl)
+        );
     }
 
+    private TLEParams buildTleParams(String satelliteIdentifier, Optional<String> satelliteName, Optional<String> tleLine1, Optional<String> tleLine2) {
+        String name = satelliteName.orElse(null);
+        String line1 = (tleLine1.isEmpty() || tleLine1.get().equals("null")) ? null : tleLine1.get();
+        String line2 = (tleLine2.isEmpty() || tleLine2.get().equals("null")) ? null : tleLine2.get();
+
+        return new TLEParams(satelliteIdentifier, name, line1, line2);
+    }
 }

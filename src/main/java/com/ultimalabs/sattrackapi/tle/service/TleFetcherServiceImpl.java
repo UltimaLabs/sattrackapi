@@ -73,7 +73,7 @@ public class TleFetcherServiceImpl implements TleFetcherService {
 
 
         if (foundTle == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No satellite matching the given identifier was found.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("No satellite matching the given identifier (%s) was found.", searchString));
         }
 
         return foundTle;

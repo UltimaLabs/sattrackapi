@@ -1,3 +1,4 @@
+
 plugins {
 	id 'org.springframework.boot' version '2.5.5'
 	id 'fr.brouillard.oss.gradle.jgitver' version '0.9.1'
@@ -10,7 +11,8 @@ apply plugin: 'java'
 apply plugin: 'io.spring.dependency-management'
 
 group = 'com.ultimalabs'
-sourceCompatibility = 1.8
+sourceCompatibility = 11
+targetCompatibility = JavaVersion.VERSION_11
 
 repositories {
 	mavenCentral()
