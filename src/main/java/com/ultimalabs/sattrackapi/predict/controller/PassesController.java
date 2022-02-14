@@ -93,8 +93,8 @@ public class PassesController {
             @PathVariable double alt,
             @Min(value = 0, message = "Elevation should not be less than 0")
             @Max(value = 90, message = "Elevation should not be greater than 90")
-
             @PathVariable double minEl,
+
             @DecimalMin(value = "0.01", message = "Step size should not be less than 0.01")
             @PathVariable double stepSize,
 

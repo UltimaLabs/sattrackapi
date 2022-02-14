@@ -27,3 +27,5 @@ provisioning/*.retry
 /dist/
 /nbdist/
 /.nb-gradle/
+
+/orekit-data/

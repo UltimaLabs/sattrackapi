@@ -330,4 +330,12 @@ class PassesControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @DisplayName("Invalid TLE parameters - 400")
+    @Test
+    public void badRequestInvalidTLEParams() throws Exception {
+        this.mockMvc.perform(get(passesWithDetaulsUrl,
+                iss, lat, lon, alt, minEl, 0.001, "null", "invalid TLE line1", "invalid TLE line2")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
 }

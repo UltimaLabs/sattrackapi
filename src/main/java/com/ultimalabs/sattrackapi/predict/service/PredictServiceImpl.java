@@ -11,10 +11,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.TimeScalesFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -84,27 +85,25 @@ class PredictServiceImpl implements PredictService {
      */
     @Override
     public List<SatellitePass> getNextEventsWithoutDetails(int n, TLEParams tleParams, ObserverParams observerParams) {
-        try {
-            List<SatellitePass> events = new ArrayList<>();
-            Predictor predictor = new Predictor(
-                    getTle(tleParams),
-                    observerParams.getLatitude(),
-                    observerParams.getLongitude(),
-                    observerParams.getAltitude(),
-                    observerParams.getMinElevation()
-            );
 
-            for (int i = 0; i < n; i++) {
-                AbsoluteDate from = shiftDateForNextPass(predictor.getSetDate());
+        List<SatellitePass> events = new ArrayList<>();
+        Predictor predictor = new Predictor(
+                getTle(tleParams),
+                observerParams.getLatitude(),
+                observerParams.getLongitude(),
+                observerParams.getAltitude(),
+                observerParams.getMinElevation()
+        );
+
+        for (int i = 0; i < n; i++) {
+            AbsoluteDate from = shiftDateForNextPass(predictor.getSetDate());
+            try {
                 events.add(predictor.getEventData(from, from.shiftedBy(259200.)));
+            } catch (LoggedEventsException e) {
+                log.error(e.getMessage(), e);
             }
-
-            return events;
-
-        } catch (LoggedEventsException e) {
-            log.error(e.getMessage(), e);
-            return Collections.emptyList();
         }
+        return events;
     }
 
     private AbsoluteDate shiftDateForNextPass(AbsoluteDate setDateOfPreviousPass) {
@@ -123,7 +122,11 @@ class PredictServiceImpl implements PredictService {
         if(tleParams.getLine1() == null || tleParams.getLine2() == null)
             return tleFetcherService.getTle(tleParams.getSatelliteIdentifier());
         else
-            return new TLEPlus(tleParams.getSatelliteName(), tleParams.getLine1(), tleParams.getLine2());
+            try {
+                return new TLEPlus(tleParams.getSatelliteName(), tleParams.getLine1(), tleParams.getLine2());
+            } catch(Exception e) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, buildInvalidTleParamsMsg(tleParams));
+            }
     }
 
     /**
@@ -131,4 +134,13 @@ class PredictServiceImpl implements PredictService {
      * @return now as an absolute date
      */
     private AbsoluteDate getNowAsAbsoluteDate() { return new AbsoluteDate(new Date(), TimeScalesFactory.getUTC());}
+
+    /**
+     * Build the bad request response message in case of invalid TLE parameters
+     * @param tleParams - Invalid TLE parameters
+     * @return built error response message
+     */
+    private String buildInvalidTleParamsMsg(TLEParams tleParams) {
+        return String.format("Invalid TLE parameters passed in the URL. %s", tleParams);
+    }
 }
