@@ -24,6 +24,8 @@ import java.util.List;
 @Service
 class PredictServiceImpl implements PredictService {
 
+    public static final double THREE_DAYS_IN_SECONDS = 259200.;
+
     private final TleFetcherService tleFetcherService;
 
     /**
@@ -44,7 +46,7 @@ class PredictServiceImpl implements PredictService {
             );
 
             AbsoluteDate now = getNowAsAbsoluteDate();
-            return predictor.getEventData(now, now.shiftedBy(259200.));
+            return predictor.getEventData(now, now.shiftedBy(THREE_DAYS_IN_SECONDS));
         } catch (LoggedEventsException e) {
             log.error(e.getMessage(), e);
             return null;
@@ -69,7 +71,7 @@ class PredictServiceImpl implements PredictService {
                     observerParams.getMinElevation()
             );
             AbsoluteDate now = getNowAsAbsoluteDate();
-            return predictor.getEventDataWithDetails(now, now.shiftedBy(259200.), stepSize);
+            return predictor.getEventDataWithDetails(now, now.shiftedBy(THREE_DAYS_IN_SECONDS), stepSize);
         } catch (LoggedEventsException e) {
             log.error(e.getMessage(), e);
             return null;
@@ -98,7 +100,7 @@ class PredictServiceImpl implements PredictService {
         for (int i = 0; i < n; i++) {
             AbsoluteDate from = shiftDateForNextPass(predictor.getSetDate());
             try {
-                events.add(predictor.getEventData(from, from.shiftedBy(259200.)));
+                events.add(predictor.getEventData(from, from.shiftedBy(THREE_DAYS_IN_SECONDS)));
             } catch (LoggedEventsException e) {
                 log.error(e.getMessage(), e);
             }
