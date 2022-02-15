@@ -7,6 +7,7 @@ import com.ultimalabs.sattrackapi.tle.model.TleDataStore;
 import com.ultimalabs.sattrackapi.tle.util.TleDataStoreBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.orekit.data.DataContext;
 import org.orekit.data.DataProvidersManager;
 import org.orekit.data.DirectoryCrawler;
 import org.springframework.http.HttpStatus;
@@ -121,7 +122,7 @@ public class TleFetcherServiceImpl implements TleFetcherService {
         tleStore = null;
 
         File orekitData = new File(config.getOrekitDataFolder());
-        DataProvidersManager manager = DataProvidersManager.getInstance();
+        DataProvidersManager manager = DataContext.getDefault().getDataProvidersManager();
         manager.addProvider(new DirectoryCrawler(orekitData));
 
         refreshTleData();

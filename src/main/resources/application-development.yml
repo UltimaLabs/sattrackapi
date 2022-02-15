@@ -3,4 +3,4 @@ sattrack:
   # Orekit data folder
   # download the data from:
   # https://gitlab.orekit.org/orekit/orekit-data/-/archive/master/orekit-data-master.zip
-  orekitDataFolder: ./orekit-data
+  orekitDataFolder: ${user.home}/opt/orekit-data
