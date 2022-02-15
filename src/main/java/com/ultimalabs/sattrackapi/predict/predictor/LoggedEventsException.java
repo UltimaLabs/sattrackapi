@@ -13,6 +13,6 @@ public class LoggedEventsException extends RuntimeException{
 
     @Override
     public String getMessage() {
-        return "Error occured while logging events for satellite '"+ satelliteName +"' occurred during propagation. Number of logged events: " + loggedEvents.size();
+        return "Could not log rise, midpoint and set events for satellite '"+ satelliteName +"'. Number of successfully logged events: " + loggedEvents.size();
     }
 }
