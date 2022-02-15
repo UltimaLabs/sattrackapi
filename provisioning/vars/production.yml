@@ -18,7 +18,7 @@ systemd_unit_after: network.target
 systemd_service_type: simple
 systemd_service_user: nobody
 systemd_service_group: nobody
-systemd_service_exec_start: /bin/java -Xms128m -Xmx256m -jar /opt/ultima/sattrackapi/sattrackapi-current.jar
+systemd_service_exec_start: /usr/java/jdk-11.0.2/bin/java -Xms128m -Xmx256m -jar /opt/ultima/sattrackapi/sattrackapi-current.jar
 systemd_service_restart: always
 
 systemd_install_wanted_by: multi-user.target
