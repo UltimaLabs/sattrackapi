@@ -15,6 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -35,18 +37,13 @@ class PredictServiceImpl implements PredictService {
      * @return next visibility event, without the details
      */
     @Override
-    public SatellitePass getNextEventWithoutDetails(TLEParams tleParams, ObserverParams observerParams) {
+    public SatellitePass getNextEvent(TLEParams tleParams, ObserverParams observerParams) {
         try {
-            Predictor predictor = new Predictor(
-                    getTle(tleParams),
-                    observerParams.getLatitude(),
-                    observerParams.getLongitude(),
-                    observerParams.getAltitude(),
-                    observerParams.getMinElevation()
-            );
-
+            Predictor predictor = getPredictor(tleParams, observerParams);
             AbsoluteDate now = getNowAsAbsoluteDate();
+
             return predictor.getEventData(now, now.shiftedBy(THREE_DAYS_IN_SECONDS));
+
         } catch (LoggedEventsException e) {
             log.error(e.getMessage(), e);
             return null;
@@ -63,15 +60,11 @@ class PredictServiceImpl implements PredictService {
     @Override
     public SatellitePass getNextEventWithDetails(TLEParams tleParams, ObserverParams observerParams, double stepSize) {
         try {
-            Predictor predictor = new Predictor(
-                    getTle(tleParams),
-                    observerParams.getLatitude(),
-                    observerParams.getLongitude(),
-                    observerParams.getAltitude(),
-                    observerParams.getMinElevation()
-            );
+            Predictor predictor = getPredictor(tleParams, observerParams);
             AbsoluteDate now = getNowAsAbsoluteDate();
+
             return predictor.getEventDataWithDetails(now, now.shiftedBy(THREE_DAYS_IN_SECONDS), stepSize);
+
         } catch (LoggedEventsException e) {
             log.error(e.getMessage(), e);
             return null;
@@ -80,34 +73,63 @@ class PredictServiceImpl implements PredictService {
 
     /**
      * Returns a number of next visibility events without pass details
-     * @param n            Number of visibility events to log and return
+     * @param numberOfDays Next number of days during which we look for the passes
      * @param tleParams TLE parameters object containing satellite identifier or satellite name and tle lines
      * @param observerParams Observer parameters object containing longitude, latitude, altitude and min elevation values
-     * @return next n visibility events, without the details
+     * @return Satellite passes in the specified next number of days
      */
     @Override
-    public List<SatellitePass> getNextEventsWithoutDetails(int n, TLEParams tleParams, ObserverParams observerParams) {
+    public List<SatellitePass> getNextEvents(int numberOfDays, TLEParams tleParams, ObserverParams observerParams) {
 
         List<SatellitePass> events = new ArrayList<>();
-        Predictor predictor = new Predictor(
+        Predictor predictor = getPredictor(tleParams, observerParams);
+
+        try {
+            boolean isWithinLimit;
+
+            do {
+                AbsoluteDate from = shiftDateForNextPass(predictor.getSetDate());
+
+                SatellitePass event = predictor.getEventData(from, from.shiftedBy(THREE_DAYS_IN_SECONDS));
+
+                LocalDateTime riseDate = LocalDateTime.parse(event.getRisePoint().getT());
+                LocalDateTime nDaysAfterRiseDate = LocalDateTime.now().plus(numberOfDays, ChronoUnit.DAYS);
+
+                isWithinLimit = riseDate.isBefore(nDaysAfterRiseDate);
+
+                if(isWithinLimit)
+                    events.add(event);
+
+            } while(isWithinLimit);
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+
+        return events;
+    }
+
+    /**
+     * Returns instantiated predictor object with the givem TLE and observer params
+     * @param tleParams TLE data
+     * @param observerParams Observer geographic coordinates
+     * @return Instantiated predictor object
+     */
+    private Predictor getPredictor(TLEParams tleParams, ObserverParams observerParams) {
+        return new Predictor(
                 getTle(tleParams),
                 observerParams.getLatitude(),
                 observerParams.getLongitude(),
                 observerParams.getAltitude(),
                 observerParams.getMinElevation()
         );
-
-        for (int i = 0; i < n; i++) {
-            AbsoluteDate from = shiftDateForNextPass(predictor.getSetDate());
-            try {
-                events.add(predictor.getEventData(from, from.shiftedBy(THREE_DAYS_IN_SECONDS)));
-            } catch (LoggedEventsException e) {
-                log.error(e.getMessage(), e);
-            }
-        }
-        return events;
     }
 
+    /**
+     * Shifts the date of the previous pass for the specified value. If the previous pass date is null, it returns the current date time
+     * @param setDateOfPreviousPass Value of how much should the previous pass date be shifted
+     * @return Shifted date
+     */
     private AbsoluteDate shiftDateForNextPass(AbsoluteDate setDateOfPreviousPass) {
         if(setDateOfPreviousPass == null)
             return getNowAsAbsoluteDate();

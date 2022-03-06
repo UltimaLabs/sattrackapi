@@ -17,6 +17,7 @@ import org.orekit.data.DataProvidersManager;
 import org.orekit.data.DirectoryCrawler;
 
 import java.io.File;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -69,15 +70,15 @@ class PredictServiceTest {
     @Test
     void returnNullWhenFailedEventLogging() {
 
-        assertNull(predictService.getNextEventWithoutDetails(tleParamsWithSatId, observerParamsWithInvalidMinEl));
+        assertNull(predictService.getNextEvent(tleParamsWithSatId, observerParamsWithInvalidMinEl));
         assertNull(predictService.getNextEventWithDetails(tleParamsWithSatId, observerParamsWithInvalidMinEl, 1.));
-        assertEquals(Collections.emptyList(), predictService.getNextEventsWithoutDetails(10, tleParamsWithSatId, observerParamsWithInvalidMinEl));
+        assertEquals(Collections.emptyList(), predictService.getNextEvents(10, tleParamsWithSatId, observerParamsWithInvalidMinEl));
     }
 
     @Test
     void returnEventDataWithoutDetails() {
 
-        assertNotNull(predictService.getNextEventWithoutDetails(tleParamsWithSatId, observerParams));
+        assertNotNull(predictService.getNextEvent(tleParamsWithSatId, observerParams));
     }
 
     @Test
@@ -87,13 +88,28 @@ class PredictServiceTest {
     }
 
     @Test
-    void returnANumberOfEventDataWithoutDetails() {
+    void returnEventsData() {
 
-        int numberOfEvents = 5;
+        int numberOfDays = 5;
 
-        List<SatellitePass> events = predictService.getNextEventsWithoutDetails(numberOfEvents, tleParamsWithSatId, observerParams);
+        List<SatellitePass> events = predictService.getNextEvents(numberOfDays, tleParamsWithSatId, observerParams);
 
         assertNotNull(events);
-        assertEquals(numberOfEvents, events.size());
+        assertFalse(events.isEmpty());
+    }
+
+    @Test
+    void returnEventDataForNextNDays() {
+
+        int numberOfDays = 5;
+
+        List<SatellitePass> events = predictService.getNextEvents(numberOfDays, tleParamsWithSatId, observerParams);
+
+        LocalDateTime firstEvent = LocalDateTime.parse(events.get(0).getRisePoint().getT());
+        LocalDateTime lastEvent = LocalDateTime.parse(events.get(events.size() - 1).getRisePoint().getT());
+
+        assertTrue(lastEvent.isAfter(firstEvent));
+        assertTrue(numberOfDays >= lastEvent.compareTo(firstEvent));
+
     }
 }

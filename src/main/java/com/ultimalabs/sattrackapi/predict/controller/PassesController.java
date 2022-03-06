@@ -56,7 +56,7 @@ public class PassesController {
             @Max(value = 90, message = "Elevation should not be greater than 90")
             @PathVariable double minEl
     ) {
-        return predictService.getNextEventWithoutDetails(
+        return predictService.getNextEvent(
                 new TLEParams(searchString),
                 new ObserverParams(lon, lat, alt, minEl)
         );
@@ -89,7 +89,7 @@ public class PassesController {
             @PathVariable(required = false) Optional<String> line2
 
     ) {
-        return predictService.getNextEventWithoutDetails(
+        return predictService.getNextEvent(
                 buildTleParamsForCustomTLE(searchString, name, line1, line2),
                 new ObserverParams(lon, lat, alt, minEl)
         );
@@ -189,7 +189,7 @@ public class PassesController {
             @Max(value = 90, message = "Elevation should not be greater than 90")
             @PathVariable double minEl
     ) {
-        return predictService.getNextEventsWithoutDetails(
+        return predictService.getNextEvents(
                 n,
                 new TLEParams(searchString),
                 new ObserverParams(lon, lat, alt, minEl)
@@ -200,7 +200,7 @@ public class PassesController {
     public List<SatellitePass> nPassesWithoutDetailsForCustomTLE(
 
             @Min(value = 1, message = "Must request at least one next satellite pass")
-            @Max(value = 20, message = "To many next satellite passes requested, max number is 20")
+            @Max(value = 20, message = "Too many next satellite passes requested, max number is 20")
             @PathVariable int n,
 
             @Size(min = 5, max = 11, message = "Satellite identifier must be between 5 and 11 characters long")
@@ -226,7 +226,7 @@ public class PassesController {
             @PathVariable(required = false) Optional<String> line1,
             @PathVariable(required = false) Optional<String> line2
     ) {
-        return predictService.getNextEventsWithoutDetails(
+        return predictService.getNextEvents(
                 n,
                 buildTleParamsForCustomTLE(searchString, name, line1, line2),
                 new ObserverParams(lon, lat, alt, minEl)

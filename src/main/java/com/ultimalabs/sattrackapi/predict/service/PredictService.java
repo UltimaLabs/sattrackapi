@@ -8,10 +8,10 @@ import java.util.List;
 
 public interface PredictService {
 
-    SatellitePass getNextEventWithoutDetails(TLEParams tleParams, ObserverParams observerParams);
+    SatellitePass getNextEvent(TLEParams tleParams, ObserverParams observerParams);
 
     SatellitePass getNextEventWithDetails(TLEParams tleParams, ObserverParams observerParams, double stepSize);
 
-    List<SatellitePass> getNextEventsWithoutDetails(int n, TLEParams tleParams, ObserverParams observerParams);
+    List<SatellitePass> getNextEvents(int numberOfDays, TLEParams tleParams, ObserverParams observerParams);
 
 }

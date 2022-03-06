@@ -53,18 +53,20 @@ public class Predictor {
 
     /**
      * Returns next pass data extracted fromm logged events during propagation without pass details
+     * @param startDate - Absolute date from which to log pass events
+     * @param endDate - Absolute date up to which to log pass events
      * @return pass event data
      * @throws LoggedEventsException Thrown when number of logged events is not valid
      */
-    public SatellitePass getEventData(AbsoluteDate from, AbsoluteDate to) throws LoggedEventsException {
+    public SatellitePass getEventData(AbsoluteDate startDate, AbsoluteDate endDate) throws LoggedEventsException {
 
-        // Propagate from now to the first raising or for the fixed duration of 72 hours
-        propagateAndLogNextSatellitePass(from, to);
+        // Propagate from startDate to the first raising or to the specified endDate
+        propagateAndLogNextSatellitePass(startDate, endDate);
 
         return new SatellitePass(
                 tle.getTle(),
-                from.getDate().toString(),
-                DoubleRound.round(riseDate.offsetFrom(from, TimeScalesFactory.getUTC()), 2),
+                startDate.getDate().toString(),
+                DoubleRound.round(riseDate.offsetFrom(startDate, TimeScalesFactory.getUTC()), 2),
                 PredictUtil.getEventDetails(riseEvent.getState(), observerFrame),
                 PredictUtil.getEventDetails(midPointEvent.getState(), observerFrame),
                 PredictUtil.getEventDetails(setEvent.getState(), observerFrame),
@@ -76,16 +78,16 @@ public class Predictor {
     /**
      *
      * Returns next pass data extracted fromm logged events during propagation and adds pass details
-     * @param from - Absolute date from which to log pass events
-     * @param to - Absolute date up to which to log pass events
+     * @param startDate - Absolute date from which to log pass events
+     * @param endDate - Absolute date up to which to log pass events
      * @param stepSize - Duration of the steps in seconds after which some custom function is called during integration
      * @return pass event data with pass details
      * @throws LoggedEventsException Thrown when number of logged events is not valid
      */
-    public SatellitePass getEventDataWithDetails(AbsoluteDate from, AbsoluteDate to, double stepSize) throws LoggedEventsException {
+    public SatellitePass getEventDataWithDetails(AbsoluteDate startDate, AbsoluteDate endDate, double stepSize) throws LoggedEventsException {
 
-        // Propagate from now to the first raising or for the fixed duration of 72 hours
-        propagateAndLogNextSatellitePass(from, to);
+        // Propagate from startDate to the first raising or to the specified endDate
+        propagateAndLogNextSatellitePass(startDate, endDate);
 
         TLEPropagator masterModePropagator = TLEPropagator.selectExtrapolator(tle);
         masterModePropagator.propagate(riseDate);
@@ -94,8 +96,8 @@ public class Predictor {
 
         return new SatellitePass(
                 tle.getTle(),
-                from.getDate().toString(),
-                DoubleRound.round(riseDate.offsetFrom(from, TimeScalesFactory.getUTC()), 2),
+                startDate.getDate().toString(),
+                DoubleRound.round(riseDate.offsetFrom(startDate, TimeScalesFactory.getUTC()), 2),
                 PredictUtil.getEventDetails(riseEvent.getState(), observerFrame),
                 PredictUtil.getEventDetails(midPointEvent.getState(), observerFrame),
                 PredictUtil.getEventDetails(setEvent.getState(), observerFrame),
