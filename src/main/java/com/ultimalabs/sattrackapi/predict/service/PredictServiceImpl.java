@@ -15,7 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDateTime;
+import java.text.SimpleDateFormat;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
@@ -92,8 +92,12 @@ class PredictServiceImpl implements PredictService {
 
                 SatellitePass event = predictor.getEventData(from, from.shiftedBy(THREE_DAYS_IN_SECONDS));
 
-                LocalDateTime riseDate = LocalDateTime.parse(event.getRisePoint().getT());
-                LocalDateTime nDaysAfterRiseDate = LocalDateTime.now().plus(numberOfDays, ChronoUnit.DAYS);
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+                String dateInString = event.getRisePoint().getT();
+                Date date = formatter.parse(dateInString);
+
+                AbsoluteDate riseDate = new AbsoluteDate(date, TimeScalesFactory.getUTC());
+                AbsoluteDate nDaysAfterRiseDate = getNowAsAbsoluteDate().shiftedBy(numberOfDays * ChronoUnit.DAYS.getDuration().toSeconds());
 
                 isWithinLimit = riseDate.isBefore(nDaysAfterRiseDate);
 
