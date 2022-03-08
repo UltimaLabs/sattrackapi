@@ -49,7 +49,7 @@ public class PredictUtil {
         double doppler = position.normalize().dotProduct(velocity);
 
         return new PassEventDataPoint(
-                s.getDate().toString(),
+                s.getDate().toString().concat("Z"),
                 DoubleRound.round(azimuth, 2),
                 DoubleRound.round(elevation, 2),
                 DoubleRound.round(distance, 0),
