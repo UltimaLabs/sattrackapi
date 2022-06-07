@@ -56,22 +56,34 @@ public class TleFetcherServiceImpl implements TleFetcherService {
 
         // Satellite Number
         if (TleFetcherServiceImpl.isInteger(searchString)) {
-            foundTle = getTleBySatelliteId(Integer.parseInt(searchString));
+
+            int id = Integer.parseInt(searchString);
+
+            foundTle = getTleBySatelliteId(id);
+
+            if (foundTle == null) {
+                foundTle = sendQueryForSatelliteTLE(String.format("https://www.celestrak.com/NORAD/elements/gp.php?CATNR=%s&FORMAT=TLE", id));
+            }
         }
 
         // International Designator
         if (searchString.length() >= 6) {
 
+            String designator = searchString;
+
             // longer International Designator variant, maybe
             if (searchString.charAt(4) == '-') {
-                String shortDesignator = searchString.substring(2, 4) + searchString.substring(5);
-                foundTle = getTleByInternationalDesignator(shortDesignator);
+                designator = searchString.substring(2, 4) + searchString.substring(5);
+                foundTle = getTleByInternationalDesignator(designator);
             } else {
                 // shorter International Designator variant
                 foundTle = getTleByInternationalDesignator(searchString);
             }
-        }
 
+            if (foundTle == null) {
+                foundTle = sendQueryForSatelliteTLE(String.format("https://www.celestrak.com/NORAD/elements/gp.php?INTDES=%s&FORMAT=TLE", designator));
+            }
+        }
 
         if (foundTle == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("No satellite matching the given identifier (%s) was found.", searchString));
@@ -80,6 +92,23 @@ public class TleFetcherServiceImpl implements TleFetcherService {
         return foundTle;
 
 
+    }
+
+    private TLEPlus sendQueryForSatelliteTLE(String tleUrl) {
+
+        List<String> tleStrings = UrlDataReader.readStringDataFromUrl(tleUrl);
+
+        List<String> tleTextData = new ArrayList<>(tleStrings);
+
+        if(tleTextData.size() == 3) {
+            return new TLEPlus(
+                    tleStrings.get(0),
+                    tleStrings.get(1),
+                    tleStrings.get(2)
+            );
+        }
+
+        return null;
     }
 
     /**

@@ -105,8 +105,8 @@ class PredictServiceTest {
 
         List<SatellitePass> events = predictService.getNextEvents(numberOfDays, tleParamsWithSatId, observerParams);
 
-        LocalDateTime firstEvent = LocalDateTime.parse(events.get(0).getRisePoint().getT());
-        LocalDateTime lastEvent = LocalDateTime.parse(events.get(events.size() - 1).getRisePoint().getT());
+        LocalDateTime firstEvent = LocalDateTime.parse(events.get(0).getRisePoint().getT().replace("Z", ""));
+        LocalDateTime lastEvent = LocalDateTime.parse(events.get(events.size() - 1).getRisePoint().getT().replace("Z", ""));
 
         assertTrue(lastEvent.isAfter(firstEvent));
         assertTrue(numberOfDays >= lastEvent.compareTo(firstEvent));
